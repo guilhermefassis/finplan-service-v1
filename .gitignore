@@ -1,0 +1,206 @@
+# ============================================
+# FINPLAN - Monorepo .gitignore
+# ============================================
+
+# ============================================
+# BACKEND (Spring Boot / Java / Maven)
+# ============================================
+
+# Compiled class files
+backend/**/*.class
+backend/**/*.jar
+backend/**/*.war
+backend/**/*.ear
+
+# Maven
+backend/**/target/
+backend/**/.mvn/
+backend/**/mvnw
+backend/**/mvnw.cmd
+
+# Gradle (caso mude para Gradle no futuro)
+backend/**/.gradle/
+backend/**/build/
+backend/**/gradle/
+backend/**/gradlew
+backend/**/gradlew.bat
+
+# Spring Boot
+backend/**/HELP.md
+backend/**/.springBeans
+backend/**/spring-boot-starter-parent/
+
+# Logs
+backend/**/*.log
+backend/**/logs/
+backend/**/log/
+
+# Application properties com dados sensíveis
+backend/**/application-local.yml
+backend/**/application-local.properties
+backend/**/application-secrets.yml
+backend/**/.env
+
+# ============================================
+# FRONTEND (Next.js / Node.js)
+# ============================================
+
+# Dependencies
+front/**/node_modules/
+front/**/.pnp
+front/**/.pnp.js
+
+# Testing
+front/**/coverage/
+front/**/.nyc_output
+
+# Next.js
+front/**/.next/
+front/**/out/
+front/**/build/
+front/**/.vercel
+
+# Production
+front/**/dist/
+
+# Environment variables
+front/**/.env
+front/**/.env*.local
+front/**/.env.local
+front/**/.env.development.local
+front/**/.env.test.local
+front/**/.env.production.local
+
+# Logs
+front/**/npm-debug.log*
+front/**/yarn-debug.log*
+front/**/yarn-error.log*
+front/**/pnpm-debug.log*
+front/**/lerna-debug.log*
+
+# ============================================
+# DOCKER
+# ============================================
+
+# Docker volumes e dados locais
+docker-data/
+*.dockerignore.bak
+
+# ============================================
+# IDEs e Editores
+# ============================================
+
+# IntelliJ IDEA
+**/.idea/
+**/*.iml
+**/*.iws
+**/*.ipr
+**/out/
+
+# Eclipse
+**/.classpath
+**/.project
+**/.settings/
+**/.metadata/
+**/bin/
+**/.factorypath
+
+# VS Code
+**/.vscode/
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+**/*.code-workspace
+
+# NetBeans
+**/nbproject/private/
+**/nbbuild/
+**/nbdist/
+**/.nb-gradle/
+
+# ============================================
+# Sistema Operacional
+# ============================================
+
+# macOS
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+**/._*
+
+# Windows
+**/Thumbs.db
+**/ehthumbs.db
+**/Desktop.ini
+**/$RECYCLE.BIN/
+
+# Linux
+**/*~
+**/.directory
+**/.Trash-*
+**/*.Identifier
+
+# ============================================
+# DOCUMENTAÇÃO
+# ============================================
+
+# Arquivos temporários de edição
+doc/**/*.tmp
+doc/**/*~
+doc/**/*.bak
+doc/**/*.swp
+
+# Não ignorar documentos importantes
+!doc/**/*.md
+!doc/**/*.pdf
+!doc/**/*.docx
+!doc/**/*.html
+
+# ============================================
+# OUTROS
+# ============================================
+
+# Arquivos de backup
+**/*.bak
+**/*.backup
+**/*.old
+
+# Arquivos temporários
+**/*.tmp
+**/*.temp
+**/.cache/
+
+# Secrets e credenciais
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/secrets/
+**/.secrets/
+
+# Database local
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Testes e coverage
+**/test-results/
+**/.pytest_cache/
+
+# ============================================
+# ESPECÍFICO DO PROJETO
+# ============================================
+
+# Dados de desenvolvimento local
+/local-data/
+/temp/
+/tmp/
+
+# Scripts de setup pessoal
+setup-local.sh
+setup-local.bat
+
+# Notas pessoais (mas mantém docs oficiais)
+NOTES.md
+TODO-personal.md
