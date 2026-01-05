@@ -1,0 +1,277 @@
+Card Name,Card Description,List Name,Labels
+[S1] Criar repositório e projeto backend (Spring Boot),"Objetivo: Ter um projeto Java 11 + Spring Boot inicializado, versionado e pronto para desenvolvimento.
+
+Checklist:
+- [ ] Criar repositório no Git (GitHub/GitLab/Bitbucket) para o backend
+- [ ] Definir convenção de branch (ex.: main + develop + feature branches)
+- [ ] Criar projeto Spring Boot (via Spring Initializr ou IDE) com dependências básicas
+- [ ] Adicionar Spring Web
+- [ ] Adicionar Spring Data JPA
+- [ ] Adicionar PostgreSQL Driver
+- [ ] Adicionar Validation (spring-boot-starter-validation)
+- [ ] Configurar .gitignore (Java, Maven/Gradle, IDEs)
+- [ ] Commit inicial com projeto gerado (Initial backend project)",Sprint 1,"Backend,Setup"
+[S1] Configurar conexão com Supabase (PostgreSQL),"Objetivo: Backend conectado ao banco do Supabase, com profile de desenvolvimento.
+
+Checklist:
+- [ ] Criar projeto no Supabase (se ainda não existir)
+- [ ] Obter credenciais (Host, porta, Database name, User e password)
+- [ ] Criar application-dev.yml com configurações de datasource
+- [ ] Configurar spring.datasource.url
+- [ ] Configurar spring.datasource.username
+- [ ] Configurar spring.datasource.password
+- [ ] Configurar spring.jpa.hibernate.ddl-auto=none
+- [ ] Configurar spring.jpa.properties.hibernate.dialect=PostgreSQLDialect
+- [ ] Configurar profile dev como padrão (spring.profiles.active=dev)
+- [ ] Criar endpoint /health simples
+- [ ] Testar conexão subindo aplicação e garantir que conecta no banco sem erro",Sprint 1,"Backend,Database,Setup"
+[S1] Aplicar script SQL do modelo (tabelas em inglês),"Objetivo: Criar todas as tabelas (users, credit_cards, credit_card_invoices, etc.) no PostgreSQL do Supabase.
+
+Checklist:
+- [ ] Revisar script SQL gerado anteriormente (tabelas em inglês, tipos corretos, JSONB, constraints)
+- [ ] Ajustar se necessário para o contexto do Supabase (schemas, permissões)
+- [ ] Executar script no Supabase (SQL Editor)
+- [ ] Validar que todas as tabelas foram criadas
+- [ ] Validar constraints de PK/FK criadas corretamente
+- [ ] Validar campos JSONB (ex.: payment_details) existem com tipo correto
+- [ ] Validar triggers de updated_at funcionando (se existirem no script)",Sprint 1,Database
+"[S1] Adicionar dependências extras (JSONB, Swagger, etc.)","Objetivo: Preparar o pom.xml para suportar JSONB, Swagger/OpenAPI e mapeamentos.
+
+Checklist:
+- [ ] Adicionar dependência Hibernate Types para JSONB (com.vladmihalcea:hibernate-types-52)
+- [ ] Adicionar dependências do Swagger/OpenAPI (springdoc-openapi-starter-webmvc-ui)
+- [ ] Garantir dependência Jackson já presente (jackson-databind)
+- [ ] Rodar mvn clean install ou equivalente para validar dependências",Sprint 1,"Backend,Setup"
+"[S1] Modelar entidades JPA (User, CreditCard, Invoice, Transaction, etc.)","Objetivo: Criar todas as entidades JPA alinhadas com o modelo de banco (nomes em inglês, snake_case no DB x camelCase no Java).
+
+Checklist:
+- [ ] Criar pacote com.seuprojeto.finplan.domain.entity
+- [ ] Criar entidade User com campos: id, name, email, paymentFrequency, paymentDetails, createdAt, updatedAt
+- [ ] Mapear paymentDetails como JSONB usando @Type(type = ""jsonb"") ou @Convert
+- [ ] Criar entidade CreditCard com mapeamento correto de user_id → user (ManyToOne)
+- [ ] Criar entidade CreditCardInvoice
+- [ ] Criar entidade CreditCardTransaction
+- [ ] Criar entidade FixedExpense
+- [ ] Criar entidade Loan
+- [ ] Criar entidade VariableExpense
+- [ ] Criar entidade Income
+- [ ] Garantir @Table(name=""..."") correto
+- [ ] Garantir @Column(name=""..."") onde o nome difere do campo Java
+- [ ] Garantir relacionamentos @ManyToOne, @OneToMany básicos",Sprint 1,"Backend,Domain"
+[S1] Implementar classe para payment_details (PaymentDetails) + Converter,"Objetivo: Ter um tipo forte para os dados de pagamento em JSONB.
+
+Checklist:
+- [ ] Criar classe PaymentDetails em pacote domain.vo ou domain.model
+- [ ] Adicionar campos: dayOfMonth, firstPaymentDay, secondPaymentDay, description (Integer/String)
+- [ ] Criar AttributeConverter (JsonbConverter)
+- [ ] Implementar convertToDatabaseColumn usando ObjectMapper.writeValueAsString
+- [ ] Implementar convertToEntityAttribute usando ObjectMapper.readValue
+- [ ] Aplicar @Convert(converter = JsonbConverter.class) em User.paymentDetails
+- [ ] Testar manualmente salvando um User com PaymentDetails populado",Sprint 1,"Backend,Domain"
+[S1] Criar repositories JPA,"Objetivo: Ter Repository interfaces para todas as entidades.
+
+Checklist:
+- [ ] Criar pacote com.seuprojeto.finplan.domain.repository
+- [ ] Criar UserRepository extends JpaRepository<User, UUID>
+- [ ] Criar CreditCardRepository
+- [ ] Criar CreditCardInvoiceRepository
+- [ ] Criar CreditCardTransactionRepository
+- [ ] Criar FixedExpenseRepository
+- [ ] Criar LoanRepository
+- [ ] Criar VariableExpenseRepository
+- [ ] Criar IncomeRepository",Sprint 1,"Backend,Domain"
+[S1] Implementar camada de DTOs + mapeamento básico,"Objetivo: Separar o modelo de API (request/response) das entidades JPA.
+
+Checklist:
+- [ ] Criar pacote com.seuprojeto.finplan.api.dto
+- [ ] Criar DTOs para criação: CreateUserRequest, CreateCreditCardRequest
+- [ ] Criar DTOs para atualização: UpdateUserRequest
+- [ ] Criar DTOs de resposta: UserResponse, CreditCardResponse
+- [ ] Implementar mappers manuais (ou preparar uso de MapStruct)
+- [ ] Criar métodos toEntity e toResponse em UserMapper, CreditCardMapper",Sprint 1,"Backend,API"
+"[S1] Criar Controllers com CRUD básico (User, CreditCard, FixedExpense)","Objetivo: Expor alguns endpoints CRUD iniciais alinhados com o Swagger.
+
+Checklist:
+- [ ] Criar pacote com.seuprojeto.finplan.api.controller
+- [ ] Criar UserController com POST /users
+- [ ] Criar endpoint GET /users/{id}
+- [ ] Criar endpoint GET /users (paginação simples ou lista)
+- [ ] Criar endpoint PUT /users/{id}
+- [ ] Criar endpoint DELETE /users/{id}
+- [ ] Criar CreditCardController com CRUD básico
+- [ ] Criar FixedExpenseController com CRUD básico
+- [ ] Garantir uso de DTOs
+- [ ] Garantir respostas HTTP adequadas (201, 200, 204, 404)",Sprint 1,"Backend,API"
+[S1] Configurar Swagger / OpenAPI (springdoc),"Objetivo: Ter documentação da API acessível via browser.
+
+Checklist:
+- [ ] Configurar springdoc-openapi
+- [ ] Verificar URL padrão (/swagger-ui.html ou /swagger-ui/index.html)
+- [ ] Adicionar informações básicas da API (titulo, descrição, versão) via application.yml ou classe de config
+- [ ] Validar se os endpoints (/users, /credit-cards, etc.) aparecem no Swagger
+- [ ] Ajustar nomes/descrições dos endpoints onde necessário",Sprint 1,"Backend,Documentation"
+[S2] Implementar cálculo de saldo mensal (GET /balance/monthly),"Objetivo: Endpoint que retorna visão de receitas, despesas e saldo por mês.
+
+Checklist:
+- [ ] Definir contrato conforme Swagger (parâmetros: userId, year, month ou intervalo)
+- [ ] Definir estrutura de resposta (totalIncome, totalFixedExpenses, totalVariableExpenses, loans, creditCardInvoices, netBalance)
+- [ ] Criar service BalanceService em domain.service
+- [ ] Implementar agregação: Somar incomes do período
+- [ ] Implementar agregação: Somar fixed_expenses relevantes ao mês
+- [ ] Implementar agregação: Somar variable_expenses do mês
+- [ ] Implementar agregação: Somar parcelas de loans que caem no mês
+- [ ] Implementar agregação: Somar credit_card_invoices com due_date no mês
+- [ ] Implementar BalanceController ou endpoint dentro de DashboardController
+- [ ] Validar com dados reais no banco ou mocks de teste",Sprint 2,"Backend,Business Logic"
+[S2] Implementar lógica básica de projeção de fluxo de caixa,"Objetivo: Endpoint que calcula projeções a alguns meses à frente.
+
+Checklist:
+- [ ] Definir parâmetros mínimos (ex.: monthsAhead, userId)
+- [ ] Criar método em BalanceService ou ProjectionService
+- [ ] Reutilizar lógica de receitas recorrentes (recurring em incomes)
+- [ ] Reutilizar lógica de despesas fixas e seus due_day
+- [ ] Reutilizar lógica de parcelas de loans restantes
+- [ ] Reutilizar lógica de faturas de cartão projetadas
+- [ ] Calcular por mês: Receita total prevista
+- [ ] Calcular por mês: Despesa total prevista
+- [ ] Calcular por mês: Saldo previsto
+- [ ] Expor em endpoint /projections/cash-flow conforme Swagger",Sprint 2,"Backend,Business Logic"
+[S2] Tratar JSONB payment_details na lógica de projeção,"Objetivo: Usar corretamente payment_details para frequências diferentes de pagamento.
+
+Checklist:
+- [ ] No cálculo de projeção: Se payment_frequency = MONTHLY, usar dayOfMonth
+- [ ] No cálculo de projeção: Se payment_frequency = BIWEEKLY, usar firstPaymentDay e secondPaymentDay
+- [ ] Se outros tipos forem necessários, documentar e implementar regra
+- [ ] Garantir que leitura de PaymentDetails é segura (null safety)
+- [ ] Adicionar testes unitários para diferentes configurações de PaymentDetails",Sprint 2,"Backend,Business Logic"
+[S2] Validações (Bean Validation) nas DTOs,"Objetivo: Garantir que dados de entrada dos endpoints sejam consistentes.
+
+Checklist:
+- [ ] Adicionar anotações em DTOs: @NotNull, @NotBlank, @Email, @Positive, etc.
+- [ ] Criar handler global de exceptions (@ControllerAdvice)
+- [ ] Tratar MethodArgumentNotValidException
+- [ ] Retornar erro padronizado (mensagens de campo, código HTTP 400)
+- [ ] Testar requisições inválidas via Postman/Insomnia/Swagger",Sprint 2,"Backend,Validation"
+[S2] Implementar testes unitários para services principais,"Objetivo: Cobrir regras de negócio críticas.
+
+Checklist:
+- [ ] Configurar dependências de teste (spring-boot-starter-test)
+- [ ] Verificar Mockito/JUnit (já vem no starter)
+- [ ] Criar testes para BalanceService (cálculo de saldo com diferentes cenários)
+- [ ] Criar testes para ProjectionService
+- [ ] Criar testes para conversor JsonbConverter / PaymentDetails
+- [ ] Usar mocks dos repositórios (@MockBean ou Mockito)
+- [ ] Cobrir cenário: Sem dados
+- [ ] Cobrir cenário: Com múltiplas receitas/despesas
+- [ ] Cobrir cenário: Com empréstimos ativos e inativos",Sprint 2,"Backend,Testing"
+[S2] Popular ambiente de desenvolvimento com dados de exemplo,"Objetivo: Facilitar testes manuais da API.
+
+Checklist:
+- [ ] Criar script SQL de INSERT com 1-2 users
+- [ ] Adicionar 2-3 credit_cards
+- [ ] Adicionar incomes mensais
+- [ ] Adicionar fixed_expenses típicas
+- [ ] Adicionar loans de exemplo
+- [ ] Adicionar variable_expenses e algumas credit_card_transactions
+- [ ] Ou criar um DataInitializer em Java que roda apenas em profile dev
+- [ ] Validar no Supabase que dados de exemplo foram inseridos",Sprint 2,"Database,Testing"
+[S3] Criar projeto Next.js e configurar estrutura base,"Objetivo: Ter o frontend Next.js inicializado e versionado.
+
+Checklist:
+- [ ] Criar repositório frontend (ou monorepo, se preferir)
+- [ ] Criar app Next.js (com TypeScript de preferência)
+- [ ] Configurar aliases de caminho (@/components, @/services, etc.)
+- [ ] Configurar layout base (Header simples, Sidebar se desejar)
+- [ ] Definir tema visual básico (cores, fonte)",Sprint 3,"Frontend,Setup"
+[S3] Configurar cliente HTTP para falar com o backend,"Objetivo: Abstrair chamadas à API em um módulo único.
+
+Checklist:
+- [ ] Criar apiClient (ex.: com fetch ou axios)
+- [ ] Centralizar Base URL da API (via variável de ambiente .env.local)
+- [ ] Centralizar tratamento básico de erros (status 4xx/5xx)
+- [ ] Criar serviço userApi.ts (getUser, createUser, etc.)
+- [ ] Criar serviço creditCardApi.ts (ao menos listagem)
+- [ ] Criar serviço fixedExpenseApi.ts (ao menos listagem)",Sprint 3,"Frontend,API Integration"
+[S3] Tela de Dashboard inicial (visão geral),"Objetivo: Exibir visão geral com saldo mensal e alguns resumos.
+
+Checklist:
+- [ ] Criar página /dashboard
+- [ ] Chamar endpoint de balance/monthly para um mês fixo (ex.: atual)
+- [ ] Exibir total de receitas
+- [ ] Exibir total de despesas
+- [ ] Exibir saldo do mês
+- [ ] Adicionar card de resumo de despesas por categoria (se já disponível, senão placeholder)
+- [ ] Adicionar card de próximas faturas de cartão (se possível, ou apenas lista simples)",Sprint 3,"Frontend,Dashboard"
+[S3] Tela de listagem e criação de Fixed Expenses,"Objetivo: Permitir CRUD básico de despesas fixas pelo frontend.
+
+Checklist:
+- [ ] Criar página /fixed-expenses
+- [ ] Implementar listagem em tabela com name, amount, due_day, category, active
+- [ ] Implementar formulário de criação com validações básicas no front
+- [ ] Integração com POST /fixed-expenses
+- [ ] Implementar formulário de edição
+- [ ] Integração com PUT /fixed-expenses/{id}
+- [ ] Permitir excluir (DELETE) com confirmação",Sprint 3,"Frontend,CRUD"
+[S3] Tela de listagem e criação de Variable Expenses,"Objetivo: Registrar despesas avulsas.
+
+Checklist:
+- [ ] Criar página /variable-expenses
+- [ ] Listar despesas do mês atual
+- [ ] Criar formulário para nova despesa com date, description, category, amount, payment_method
+- [ ] Chamar endpoint do backend para criar despesa
+- [ ] Chamar endpoint do backend para listar despesas",Sprint 3,"Frontend,CRUD"
+[S3] Tela de cartões de crédito e faturas,"Objetivo: Visualizar cartões e, pelo menos, as faturas.
+
+Checklist:
+- [ ] Criar página /credit-cards
+- [ ] Listar cartões com name, brand, credit_limit, closing_day, due_day
+- [ ] Ao clicar em um cartão: Exibir faturas (lista das últimas N)
+- [ ] Mostrar status (OPEN, PAID etc.) e valores das faturas
+- [ ] Integrar com endpoints de credit_cards
+- [ ] Integrar com endpoints de credit_card_invoices",Sprint 3,"Frontend,CRUD"
+[S4] Melhorar tratamento de erros e logs no backend,"Objetivo: Tornar o backend mais robusto e observável.
+
+Checklist:
+- [ ] Padronizar responses de erro (estrutura JSON)
+- [ ] Ajustar @ControllerAdvice para EntityNotFoundException → 404
+- [ ] Ajustar @ControllerAdvice para DataIntegrityViolationException → 400/409
+- [ ] Configurar logs com formato legível
+- [ ] Configurar logs mínimos para requests importantes",Sprint 4,"Backend,Quality"
+[S4] Dockerizar backend e frontend,"Objetivo: Ter ambiente containerizado para rodar fácil em qualquer máquina.
+
+Checklist:
+- [ ] Criar Dockerfile para backend (Spring Boot JAR)
+- [ ] Usar multi-stage build para otimizar imagem
+- [ ] Criar Dockerfile para frontend (Next.js)
+- [ ] Build de produção + imagem leve (Node/NGINX, conforme estratégia)
+- [ ] Criar docker-compose.yml com serviços: backend, frontend
+- [ ] Configurar variáveis de ambiente para apontar para Supabase
+- [ ] Testar docker-compose up local
+- [ ] Documentar no README como rodar o projeto com Docker",Sprint 4,"DevOps,Docker"
+[S4] Integração básica de autenticação com Supabase (ou stub),"Objetivo: Começar a alinhar modelo de usuário com autenticação real.
+
+Checklist:
+- [ ] Decidir estratégia inicial: Usar auth do Supabase direto no front? Ou manter userId fixo/hardcoded?
+- [ ] Se integrar Supabase Auth no front: Criar tela de login simples
+- [ ] Se integrar Supabase Auth no front: Criar guard em rotas protegidas (/dashboard, etc.)
+- [ ] Mapear userId autenticado para chamadas da API
+- [ ] Documentar decisão tomada para próximas iterações",Sprint 4,"Frontend,Backend,Security"
+[S4] Revisão geral do fluxo principal (happy path),"Objetivo: Garantir que o caminho principal do usuário esteja funcionando fim a fim.
+
+Checklist:
+- [ ] Definir cenário: Usuário logado (ou ID fixo)
+- [ ] Testar fluxo: Ver dashboard do mês atual
+- [ ] Testar fluxo: Cadastrar despesa fixa
+- [ ] Testar fluxo: Cadastrar despesa variável
+- [ ] Testar fluxo: Ver impacto no saldo mensal
+- [ ] Identificar e registrar bugs em cartões separados no Trello
+- [ ] Ajustar pequenos problemas de UX no frontend",Sprint 4,"Testing,QA"
+[S4] Documentação mínima para o projeto (README),"Objetivo: Facilitar onboarding e manutenção futura.
+
+Checklist:
+- [ ] Descrever arquitetura geral (Backend Java, DB Supabase, Front Next.js)
+- [ ] Adicionar instruções para rodar backend local (sem Docker)
+- [ ] Adicionar instruções para rodar frontend local
+- [ ] Adicionar instruções para rodar com Docker (docker-compose)
+- [ ] Explicar brevemente endpoints principais (ou linkar para Swagger)
+- [ ] Adicionar seção de troubleshooting comum",Sprint 4,Documentation
