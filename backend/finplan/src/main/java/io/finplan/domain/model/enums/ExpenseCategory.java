@@ -1,6 +1,6 @@
 package io.finplan.domain.model.enums;
 
-public enum FixedExpenseCategoryEnum {
+public enum ExpenseCategory {
     HOUSING,
     UTILITIES,
     COMMUNICATION,

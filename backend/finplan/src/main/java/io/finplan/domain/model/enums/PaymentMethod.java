@@ -1,7 +1,7 @@
 package io.finplan.domain.model.enums;
 
 
-public enum PaymentMethodEnum {
+public enum PaymentMethod {
     CREDIT_CARD,
     DEBIT_CARD,
     BANK_TRANSFER,

@@ -2,7 +2,6 @@ package io.finplan.domain.entity;
 
 import io.finplan.domain.model.enums.ExpenseCategory;
 import io.finplan.domain.model.enums.PaymentMethod;
-import io.finplan.domain.model.enums.RecurrenceTypeEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,14 +9,15 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "fixed_expenses")
+@Table(name = "variable_expenses")
 @Getter
 @Setter
-public class FixedExpenses {
+public class VariableExpenses {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,7 +28,10 @@ public class FixedExpenses {
     private User user;
 
     @Column(nullable = false)
-    private String name;
+    private LocalDate date;
+
+    @Column(nullable = false)
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
@@ -37,19 +40,9 @@ public class FixedExpenses {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "due_date", nullable = false)
-    private Integer dueDate;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private RecurrenceTypeEnum recurrence;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", length = 50, nullable = false)
     private PaymentMethod paymentMethod;
-
-    @Column(nullable = false)
-    private boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -58,4 +51,6 @@ public class FixedExpenses {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
+
 }
