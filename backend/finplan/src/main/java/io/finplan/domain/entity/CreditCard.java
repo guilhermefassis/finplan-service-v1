@@ -1,51 +1,53 @@
 package io.finplan.domain.entity;
 
-import io.finplan.domain.model.enums.PaymentFrequencyEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
 
+
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "credit_card")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class CreditCard {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(nullable = false)
     private String name;
 
-    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    //private List<CreditCard> creditCards;
-
     @Column(nullable = false)
-    private String email;
+    private String brand;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_frequency", nullable = false, length = 20)
-    private PaymentFrequencyEnum paymentFrequency;
+    @Column(name = "closing_day", nullable = false)
+    private Integer closingDay;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "payment_details", nullable = false, columnDefinition = "jsonb")
-    @Builder.Default
-    private Map<String, Object> paymentDetails = new HashMap<>();
+    @Column(name = "due_day", nullable = false)
+    private Integer dueDay;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @Column(name = "credit_limit", precision = 15, scale = 2)
+    private BigDecimal creditLimit;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     @UpdateTimestamp
     @Column(name = "created_at", nullable = false)
