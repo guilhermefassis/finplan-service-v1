@@ -44,6 +44,7 @@ CREATE TABLE credit_card_transactions (
     description VARCHAR(255) NOT NULL,
     category VARCHAR(50),
     amount DECIMAL(15,2) NOT NULL,
+    total_purchase_amount DECIMAL(15,2) NOT NULL,
     installments BOOLEAN DEFAULT FALSE,
     total_installments INTEGER,
     current_installment INTEGER,
