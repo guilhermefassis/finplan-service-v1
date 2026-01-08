@@ -14,9 +14,6 @@ import java.util.UUID;
 @Table(name = "credit_card")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CreditCard {
 
     @Id
@@ -39,17 +36,17 @@ public class CreditCard {
     @Column(name = "due_day", nullable = false)
     private Integer dueDay;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
     @Column(name = "credit_limit", precision = 15, scale = 2)
     private BigDecimal creditLimit;
 
     @Column(nullable = false)
     private boolean active = true;
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
     @UpdateTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "update_at", nullable = false)
     private OffsetDateTime updatedAt;
 }

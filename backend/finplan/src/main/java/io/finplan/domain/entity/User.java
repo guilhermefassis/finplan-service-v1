@@ -48,6 +48,6 @@ public class User {
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "update_at", nullable = false)
     private OffsetDateTime updatedAt;
 }
