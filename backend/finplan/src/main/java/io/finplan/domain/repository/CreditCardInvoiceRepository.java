@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CreditCardInvoicesRepository extends JpaRepository<CreditCardInvoice, UUID> {
+public interface CreditCardInvoiceRepository extends JpaRepository<CreditCardInvoice, UUID> {
     List<CreditCardInvoice> findByCreditCardId(UUID creditCardId);
 
     List<CreditCardInvoice> findByCreditCardIdAndStatus(UUID creditCardId,

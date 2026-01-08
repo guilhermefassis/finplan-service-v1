@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface FixedExpensesRepository extends JpaRepository<FixedExpenses, UUID> {
+public interface FixedExpenseRepository extends JpaRepository<FixedExpenses, UUID> {
     List<FixedExpenses> findByUserId(UUID userId);
 
     List<FixedExpenses> findByUserIdAndActiveTrue(UUID userId);
