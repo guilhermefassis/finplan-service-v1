@@ -1,6 +1,6 @@
 package io.finplan.domain.model.enums;
 
-public enum PaymentFrequencyEnum {
+public enum PaymentFrequency {
     MONTHLY,
     BIWEEKLY,
     WEEKLY,

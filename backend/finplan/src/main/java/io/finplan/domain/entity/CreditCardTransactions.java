@@ -1,6 +1,6 @@
 package io.finplan.domain.entity;
 
-import io.finplan.domain.model.enums.CreditCardTransactionCategoryEnum;
+import io.finplan.domain.model.enums.CreditCardTransactionCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +38,7 @@ public class CreditCardTransactions {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private CreditCardTransactionCategoryEnum category;
+    private CreditCardTransactionCategory category;
 
     @Column(nullable = false)
     private BigDecimal amount;

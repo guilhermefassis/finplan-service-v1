@@ -1,6 +1,6 @@
 package io.finplan.domain.model.enums;
 
-public enum StatusEnum {
+public enum StatusType {
     OPEN,
     CLOSED,
     PAID

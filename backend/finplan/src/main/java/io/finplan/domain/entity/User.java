@@ -1,6 +1,6 @@
 package io.finplan.domain.entity;
 
-import io.finplan.domain.model.enums.PaymentFrequencyEnum;
+import io.finplan.domain.model.enums.PaymentFrequency;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -36,7 +36,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_frequency", nullable = false, length = 20)
-    private PaymentFrequencyEnum paymentFrequency;
+    private PaymentFrequency paymentFrequency;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payment_details", nullable = false, columnDefinition = "jsonb")

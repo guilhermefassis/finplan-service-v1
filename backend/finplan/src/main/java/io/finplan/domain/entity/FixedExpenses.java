@@ -2,7 +2,7 @@ package io.finplan.domain.entity;
 
 import io.finplan.domain.model.enums.ExpenseCategory;
 import io.finplan.domain.model.enums.PaymentMethod;
-import io.finplan.domain.model.enums.RecurrenceTypeEnum;
+import io.finplan.domain.model.enums.RecurrenceType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +42,7 @@ public class FixedExpenses {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private RecurrenceTypeEnum recurrence;
+    private RecurrenceType recurrence;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", length = 50, nullable = false)

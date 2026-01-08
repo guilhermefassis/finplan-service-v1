@@ -1,6 +1,6 @@
 package io.finplan.domain.model.enums;
 
-public enum RecurrenceTypeEnum {
+public enum RecurrenceType {
     MONTHLY,
     BIMONTHLY,
     QUARTERLY,

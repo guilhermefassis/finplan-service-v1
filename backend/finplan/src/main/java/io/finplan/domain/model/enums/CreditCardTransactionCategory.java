@@ -1,6 +1,6 @@
 package io.finplan.domain.model.enums;
 
-public enum CreditCardTransactionCategoryEnum {
+public enum CreditCardTransactionCategory {
     FOOD_AND_DINING,
     GROCERIES,
     TRANSPORTATION,

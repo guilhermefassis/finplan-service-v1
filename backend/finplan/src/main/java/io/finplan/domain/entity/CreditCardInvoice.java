@@ -1,13 +1,12 @@
 package io.finplan.domain.entity;
 
 
-import io.finplan.domain.model.enums.StatusEnum;
+import io.finplan.domain.model.enums.StatusType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ public class CreditCardInvoice {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusEnum status;
+    private StatusType status;
 
     @Column(name = "payment_date", nullable = false)
     private LocalDate paymentDate;
