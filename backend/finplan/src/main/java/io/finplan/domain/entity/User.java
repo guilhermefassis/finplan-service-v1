@@ -36,7 +36,7 @@ public class User {
     private PaymentFrequency paymentFrequency;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "payment_details", nullable = false, columnDefinition = "jsonb")
+    @Column(name = "payment_details", columnDefinition = "jsonb")
     @Builder.Default
     private Map<String, Object> paymentDetails = new HashMap<>();
 
