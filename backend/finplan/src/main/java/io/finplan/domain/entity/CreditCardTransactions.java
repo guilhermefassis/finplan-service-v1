@@ -43,7 +43,7 @@ public class CreditCardTransactions {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "total_purchase_amount", nullable = false)
+    @Column(name = "total_purchase_amount", precision = 15, scale = 2, nullable = false)
     private BigDecimal totalPurchaseAmount;
 
     @Column(nullable = false)
