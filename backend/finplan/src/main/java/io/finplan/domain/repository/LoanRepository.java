@@ -14,5 +14,5 @@ public interface LoanRepository extends JpaRepository<Loans, UUID> {
 
     List<Loans> findByUserIdAndInstitution(UUID userId, String institution);
 
-    List<Loans> findByUserIdAndDueDay(UUID userId, Integer dueDay);
+    List<Loans> findByUserIdAndDueDate(UUID userId, Integer dueDate);
 }
