@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface CreditCardTransactionRepository extends JpaRepository<CreditCardTransactions, UUID> {
     List<CreditCardTransactions> findByCreditCardId(UUID creditCardId);
 
-    List<CreditCardTransactions> findByInvoiceId(UUID invoiceId);
+    List<CreditCardTransactions> findByCreditCardInvoice(UUID creditCardInvoice);
 
     List<CreditCardTransactions> findByCreditCardIdAndPurchaseDateBetween(UUID creditCardId,
                                                                           LocalDate start,

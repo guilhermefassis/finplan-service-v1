@@ -13,5 +13,5 @@ public interface FixedExpenseRepository extends JpaRepository<FixedExpenses, UUI
 
     List<FixedExpenses> findByUserIdAndCategory(UUID userId, String category);
 
-    List<FixedExpenses> findByUserIdAndDueDay(UUID userId, Integer dueDay);
+    List<FixedExpenses> findByUserIdAndDueDate(UUID userId, Integer dueDate);
 }
