@@ -4,6 +4,7 @@ package io.finplan.service.user;
 import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.entity.User;
+import io.finplan.domain.exception.BusinessRuleException;
 import io.finplan.domain.repository.UserRepository;
 import io.finplan.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,10 @@ public class UserService {
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO request) {
         if(userRepository.existsByEmail(request.email())){
-            throw new RuntimeException("Email already registered!");
+            throw new BusinessRuleException("Email already registered");
         }
         User user = userMapper.toEntity(request);
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.saveAndFlush(user);
         return userMapper.toResponseDTO(savedUser);
     }
 
