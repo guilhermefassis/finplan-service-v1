@@ -4,6 +4,7 @@ import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.entity.User;
 import io.finplan.domain.exception.BusinessRuleException;
+import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.mapper.UserMapper;
 import io.finplan.domain.model.enums.PaymentFrequency;
 import io.finplan.domain.repository.UserRepository;
@@ -207,5 +208,69 @@ class UserServiceTest {
         verify(userRepository).findAll();
         verify(userMapper).toResponseDTOList(emptyList);
         verifyNoMoreInteractions(userRepository, userMapper);
+    }
+
+    @Test
+    @DisplayName("getUser - should return user when found")
+    void getUser_ShouldReturnUser_WhenFound() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+
+        User user = User.builder()
+                .id(userId)
+                .name("João Silva")
+                .email("joao@email.com")
+                .paymentFrequency(PaymentFrequency.MONTHLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        UserResponseDTO expectedDto = new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPaymentFrequency(),
+                user.getPaymentDetails(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+
+        when(userRepository.findById(eq(userId))).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDTO(eq(user))).thenReturn(expectedDto);
+
+        // Act
+        UserResponseDTO result = userService.getUser(userId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userId, result.id());
+        assertEquals("João Silva", result.name());
+        assertEquals("joao@email.com", result.email());
+
+        verify(userRepository).findById(userId);
+        verify(userMapper).toResponseDTO(user);
+        verifyNoMoreInteractions(userRepository, userMapper);
+    }
+
+    @Test
+    @DisplayName("getUser - should throw ResourceNotFoundException when user not found")
+    void getUser_ShouldThrowResourceNotFoundException_WhenUserNotFound() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+
+        when(userRepository.findById(eq(userId))).thenReturn(Optional.empty());
+
+        // Act & Assert
+        ResourceNotFoundException ex = assertThrows(
+                ResourceNotFoundException.class,
+                () -> userService.getUser(userId)
+        );
+
+        assertEquals("User not found", ex.getMessage());
+
+        verify(userRepository).findById(userId);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(userMapper);
     }
 }
