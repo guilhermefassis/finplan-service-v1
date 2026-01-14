@@ -7,6 +7,8 @@ import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserMapper extends BaseMapper {
 
@@ -34,5 +36,11 @@ public class UserMapper extends BaseMapper {
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+    public List<UserResponseDTO> toResponseDTOList(List<User> users) {
+        return users.stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 }

@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,6 +28,11 @@ public class UserService {
         User user = userMapper.toEntity(request);
         User savedUser = userRepository.saveAndFlush(user);
         return userMapper.toResponseDTO(savedUser);
+    }
+
+    public List<UserResponseDTO> getUsers() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toResponseDTOList(users);
     }
 
 }

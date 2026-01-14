@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
@@ -20,4 +22,10 @@ public class UserController {
     public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO requestDTO) {
         return userService.createUser(requestDTO);
     }
+
+    @GetMapping
+    public List<UserResponseDTO> getUsers() {
+        return userService.getUsers();
+    }
+
 }
