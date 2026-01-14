@@ -213,4 +213,54 @@ class UserServiceTest {
         verifyNoMoreInteractions(userRepository);
         verifyNoInteractions(userMapper);
     }
+
+    @Test
+    @DisplayName("deleteUser - should delete user when found")
+    void deleteUser_ShouldDeleteUser_WhenFound() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+
+        User user = User.builder()
+                .id(userId)
+                .name("João Silva")
+                .email("joao@email.com")
+                .paymentFrequency(PaymentFrequency.MONTHLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        when(userRepository.findById(eq(userId))).thenReturn(Optional.of(user));
+
+        // Act
+        userService.deleteUser(userId);
+
+        // Assert
+        verify(userRepository).findById(userId);
+        verify(userRepository).delete(user);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(userMapper);
+    }
+
+    @Test
+    @DisplayName("deleteUser - should throw ResourceNotFoundException when user not found")
+    void deleteUser_ShouldThrowResourceNotFoundException_WhenUserNotFound() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+
+        when(userRepository.findById(eq(userId))).thenReturn(Optional.empty());
+
+        // Act & Assert
+        ResourceNotFoundException ex = assertThrows(
+                ResourceNotFoundException.class,
+                () -> userService.deleteUser(userId)
+        );
+
+        assertEquals("User not fount", ex.getMessage()); // Mantive o typo do seu código
+
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).delete(any(User.class));
+        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(userMapper);
+    }
 }
