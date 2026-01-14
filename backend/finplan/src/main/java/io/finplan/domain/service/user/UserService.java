@@ -5,6 +5,7 @@ import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.entity.User;
 import io.finplan.domain.exception.BusinessRuleException;
+import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.repository.UserRepository;
 import io.finplan.domain.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,12 @@ public class UserService {
     public List<UserResponseDTO> getUsers() {
         List<User> users = userRepository.findAll();
         return userMapper.toResponseDTOList(users);
+    }
+
+    public UserResponseDTO getUser(UUID user_id) {
+        User user = userRepository.findById(user_id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userMapper.toResponseDTO(user);
     }
 
 }
