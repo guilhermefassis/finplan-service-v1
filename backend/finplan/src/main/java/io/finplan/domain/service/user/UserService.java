@@ -1,4 +1,4 @@
-package io.finplan.service.user;
+package io.finplan.domain.service.user;
 
 
 import io.finplan.api.dto.user.UserRequestDTO;
@@ -6,7 +6,7 @@ import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.entity.User;
 import io.finplan.domain.exception.BusinessRuleException;
 import io.finplan.domain.repository.UserRepository;
-import io.finplan.service.mapper.UserMapper;
+import io.finplan.domain.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

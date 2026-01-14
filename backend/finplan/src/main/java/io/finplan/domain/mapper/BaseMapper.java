@@ -1,4 +1,4 @@
-package io.finplan.service.mapper;
+package io.finplan.domain.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

@@ -2,7 +2,7 @@ package io.finplan.api.controller;
 
 import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
-import io.finplan.service.user.UserService;
+import io.finplan.domain.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
