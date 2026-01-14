@@ -9,11 +9,13 @@ import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.repository.UserRepository;
 import io.finplan.domain.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,9 +35,9 @@ public class UserService {
         return userMapper.toResponseDTO(savedUser);
     }
 
-    public List<UserResponseDTO> getUsers() {
-        List<User> users = userRepository.findAll();
-        return userMapper.toResponseDTOList(users);
+    public Page<UserResponseDTO> getUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userMapper::toResponseDTO);
     }
 
     public UserResponseDTO getUser(UUID user_id) {

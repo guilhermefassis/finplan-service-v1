@@ -15,6 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -123,91 +126,28 @@ class UserServiceTest {
         verifyNoInteractions(userMapper); // não deve mapear nem salvar
     }
 
-    @Test
-    @DisplayName("getUsers - Should return a list with users")
-    void getUsers_ShouldReturnUserList() {
-
-        User user1 = User.builder()
-                .id(UUID.randomUUID())
-                .name("João Silva")
-                .email("joao@email.com")
-                .paymentFrequency(PaymentFrequency.MONTHLY)
-                .paymentDetails(new HashMap<>())
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
-
-        User user2 = User.builder()
-                .id(UUID.randomUUID())
-                .name("Maria Santos")
-                .email("maria@email.com")
-                .paymentFrequency(PaymentFrequency.WEEKLY)
-                .paymentDetails(new HashMap<>())
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
-
-        List<User> users = Arrays.asList(user1, user2);
-
-        UserResponseDTO dto1 = new UserResponseDTO(
-                user1.getId(),
-                user1.getName(),
-                user1.getEmail(),
-                user1.getPaymentFrequency(),
-                user1.getPaymentDetails(),
-                user1.getCreatedAt(),
-                user1.getUpdatedAt()
-        );
-
-        UserResponseDTO dto2 = new UserResponseDTO(
-                user2.getId(),
-                user2.getName(),
-                user2.getEmail(),
-                user2.getPaymentFrequency(),
-                user2.getPaymentDetails(),
-                user2.getCreatedAt(),
-                user2.getUpdatedAt()
-        );
-
-        List<UserResponseDTO> expectedDtos = Arrays.asList(dto1, dto2);
-
-        when(userRepository.findAll()).thenReturn(users);
-        when(userMapper.toResponseDTOList(eq(users))).thenReturn(expectedDtos);
-
-        // Act
-        List<UserResponseDTO> result = userService.getUsers();
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("joao@email.com", result.get(0).email());
-        assertEquals("maria@email.com", result.get(1).email());
-
-        verify(userRepository).findAll();
-        verify(userMapper).toResponseDTOList(users);
-        verifyNoMoreInteractions(userRepository, userMapper);
-    }
 
     @Test
-    @DisplayName("getUsers - Should return a empty list when don't have users registered")
-    void getUsers_ShouldReturnEmptyList_WhenNoUsersExist() {
+    @DisplayName("getUsers - should return an empty page when no users are registered")
+    void getUsers_ShouldReturnEmptyPage_WhenNoUsersExist() {
         // Arrange
-        List<User> emptyList = Collections.emptyList();
-        List<UserResponseDTO> emptyDtoList = Collections.emptyList();
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<User> emptyPage = Page.empty(pageable);
 
-        when(userRepository.findAll()).thenReturn(emptyList);
-        when(userMapper.toResponseDTOList(eq(emptyList))).thenReturn(emptyDtoList);
+        when(userRepository.findAll(pageable)).thenReturn(emptyPage);
 
         // Act
-        List<UserResponseDTO> result = userService.getUsers();
+        Page<UserResponseDTO> result = userService.getUsers(pageable);
 
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
+        assertEquals(0, result.getTotalElements());
+        assertEquals(0, result.getTotalPages());
 
-        verify(userRepository).findAll();
-        verify(userMapper).toResponseDTOList(emptyList);
-        verifyNoMoreInteractions(userRepository, userMapper);
+        verify(userRepository).findAll(pageable);
+        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(userMapper);
     }
 
     @Test

@@ -5,10 +5,12 @@ import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.domain.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponseDTO> getUsers() {
-        return userService.getUsers();
+    public Page<UserResponseDTO> getUsers(@PageableDefault(size = 5, sort = "createdAt") Pageable pageable) {
+        return userService.getUsers(pageable);
     }
 
     @GetMapping("/{user_id}")
