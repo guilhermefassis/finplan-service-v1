@@ -12,11 +12,9 @@ import io.finplan.domain.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -53,6 +51,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional
     public UserResponseDTO updateUser(UUID user_id, UserUpdateDTO request) {
         User user = userRepository.findById(user_id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
