@@ -2,6 +2,7 @@ package io.finplan.api.controller;
 
 import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
+import io.finplan.api.dto.user.UserUpdateDTO;
 import io.finplan.domain.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -39,5 +40,10 @@ public class UserController {
     @DeleteMapping("/{user_id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable UUID user_id) { userService.deleteUser(user_id);}
+
+    @PutMapping("/{user_id}")
+    public UserResponseDTO updateUser(@PathVariable UUID user_id, @Valid @RequestBody UserUpdateDTO requestDTO) {
+        return userService.updateUser(user_id, requestDTO);
+    }
 
 }

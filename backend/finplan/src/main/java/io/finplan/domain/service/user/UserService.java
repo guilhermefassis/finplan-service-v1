@@ -3,6 +3,7 @@ package io.finplan.domain.service.user;
 
 import io.finplan.api.dto.user.UserRequestDTO;
 import io.finplan.api.dto.user.UserResponseDTO;
+import io.finplan.api.dto.user.UserUpdateDTO;
 import io.finplan.domain.entity.User;
 import io.finplan.domain.exception.BusinessRuleException;
 import io.finplan.domain.exception.ResourceNotFoundException;
@@ -50,5 +51,33 @@ public class UserService {
         User user = userRepository.findById(user_id)
                         .orElseThrow(() -> new ResourceNotFoundException("User not fount"));
         userRepository.delete(user);
+    }
+
+    public UserResponseDTO updateUser(UUID user_id, UserUpdateDTO request) {
+        User user = userRepository.findById(user_id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if(!user.getEmail().equals(request.email()) && userRepository.existsByEmail(request.email())){
+            throw new BusinessRuleException("Email already registered");
+        }
+
+        if(request.name() != null ) {
+            user.setName(request.name());
+        }
+
+        if(request.email() != null) {
+            user.setEmail(request.email());
+        }
+
+        if(request.paymentFrequency() != null){
+            user.setPaymentFrequency(request.paymentFrequency());
+        }
+
+        if(request.paymentDetails() != null && !request.paymentDetails().isEmpty()) {
+            user.setPaymentFrequency(request.paymentFrequency());
+        }
+
+        User updatedUser = userRepository.saveAndFlush(user);
+        return userMapper.toResponseDTO(updatedUser);
     }
 }
