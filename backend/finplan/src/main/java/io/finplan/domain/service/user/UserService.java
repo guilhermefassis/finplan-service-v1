@@ -46,4 +46,9 @@ public class UserService {
         return userMapper.toResponseDTO(user);
     }
 
+    public void deleteUser(UUID user_id) {
+        User user = userRepository.findById(user_id)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not fount"));
+        userRepository.delete(user);
+    }
 }

@@ -36,4 +36,8 @@ public class UserController {
         return userService.getUser(user_id);
     }
 
+    @DeleteMapping("/{user_id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable UUID user_id) { userService.deleteUser(user_id);}
+
 }
