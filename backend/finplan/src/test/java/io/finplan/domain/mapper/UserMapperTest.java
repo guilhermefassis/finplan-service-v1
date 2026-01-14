@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +21,7 @@ class UserMapperTest {
     private UserMapper userMapper;
 
     @Test
-    @DisplayName("toEntity - Must convert the request Dto in a entity")
+    @DisplayName("toEntity - Should convert the request Dto in a entity")
     void toEntity_ShouldConvertCorrectly() {
         // Arrange
         Map<String, Object> paymentDetails = new HashMap<>();
@@ -54,7 +52,7 @@ class UserMapperTest {
     }
 
     @Test
-    @DisplayName("toEntity - Must deal with a empty entity")
+    @DisplayName("toEntity - Should deal with a empty entity")
     void toEntity_ShouldHandleEmptyPaymentDetails() {
         UserRequestDTO dto = new UserRequestDTO(
                 "Maria Santos",
@@ -74,7 +72,7 @@ class UserMapperTest {
     }
 
     @Test
-    @DisplayName("toResponseDTO - Must convert a user in response DTO")
+    @DisplayName("toResponseDTO - Should convert a user in response DTO")
     void toResponseDTO_ShouldConvertCorrectly() {
         // Arrange
         UUID userId = UUID.randomUUID();
@@ -108,7 +106,7 @@ class UserMapperTest {
     }
 
     @Test
-    @DisplayName("toResponseDTO - Must deal with empty payment details")
+    @DisplayName("toResponseDTO - Should deal with empty payment details")
     void toResponseDTO_ShouldHandleEmptyPaymentDetails() {
         // Arrange
         UUID userId = UUID.randomUUID();
@@ -167,5 +165,67 @@ class UserMapperTest {
         assertNotNull(responseDTO.id());
         assertNotNull(responseDTO.createdAt());
         assertNotNull(responseDTO.updatedAt());
+    }
+
+    @Test
+    @DisplayName("toResponseDTOList - Should convert User list to UserResponseDTO list")
+    void toResponseDTOList_ShouldConvertList() {
+        // Arrange
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        User user1 = User.builder()
+                .id(userId1)
+                .name("João Silva")
+                .email("joao@email.com")
+                .paymentFrequency(PaymentFrequency.MONTHLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        User user2 = User.builder()
+                .id(userId2)
+                .name("Maria Santos")
+                .email("maria@email.com")
+                .paymentFrequency(PaymentFrequency.WEEKLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        List<User> users = Arrays.asList(user1, user2);
+
+
+        List<UserResponseDTO> dtos = userMapper.toResponseDTOList(users);
+
+
+        assertNotNull(dtos);
+        assertEquals(2, dtos.size());
+
+        assertEquals(userId1, dtos.get(0).id());
+        assertEquals("João Silva", dtos.get(0).name());
+        assertEquals("joao@email.com", dtos.get(0).email());
+        assertEquals(PaymentFrequency.MONTHLY, dtos.get(0).paymentFrequency());
+
+        assertEquals(userId2, dtos.get(1).id());
+        assertEquals("Maria Santos", dtos.get(1).name());
+        assertEquals("maria@email.com", dtos.get(1).email());
+        assertEquals(PaymentFrequency.WEEKLY, dtos.get(1).paymentFrequency());
+    }
+
+    @Test
+    @DisplayName("toResponseDTOList - Should return a empty list when received a empty list")
+    void toResponseDTOList_ShouldReturnEmptyList_WhenInputIsEmpty() {
+        // Arrange
+        List<User> emptyList = Collections.emptyList();
+
+        // Act
+        List<UserResponseDTO> result = userMapper.toResponseDTOList(emptyList);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

@@ -16,8 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +36,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    @DisplayName("createUser - Must create a new User")
+    @DisplayName("createUser - Should create a new User")
     void createUser_Success() {
         // Arrange
         UserRequestDTO request = new UserRequestDTO(
@@ -98,7 +97,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("createUser - Must throws a BusinessRuleException")
+    @DisplayName("createUser - Should throws a BusinessRuleException")
     void createUser_ShouldThrowBusinessRuleException_WhenEmailAlreadyExists() {
         // Arrange
         UserRequestDTO request = new UserRequestDTO(
@@ -121,5 +120,92 @@ class UserServiceTest {
         verify(userRepository).existsByEmail(request.email());
         verifyNoMoreInteractions(userRepository);
         verifyNoInteractions(userMapper); // não deve mapear nem salvar
+    }
+
+    @Test
+    @DisplayName("getUsers - Should return a list with users")
+    void getUsers_ShouldReturnUserList() {
+
+        User user1 = User.builder()
+                .id(UUID.randomUUID())
+                .name("João Silva")
+                .email("joao@email.com")
+                .paymentFrequency(PaymentFrequency.MONTHLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        User user2 = User.builder()
+                .id(UUID.randomUUID())
+                .name("Maria Santos")
+                .email("maria@email.com")
+                .paymentFrequency(PaymentFrequency.WEEKLY)
+                .paymentDetails(new HashMap<>())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        List<User> users = Arrays.asList(user1, user2);
+
+        UserResponseDTO dto1 = new UserResponseDTO(
+                user1.getId(),
+                user1.getName(),
+                user1.getEmail(),
+                user1.getPaymentFrequency(),
+                user1.getPaymentDetails(),
+                user1.getCreatedAt(),
+                user1.getUpdatedAt()
+        );
+
+        UserResponseDTO dto2 = new UserResponseDTO(
+                user2.getId(),
+                user2.getName(),
+                user2.getEmail(),
+                user2.getPaymentFrequency(),
+                user2.getPaymentDetails(),
+                user2.getCreatedAt(),
+                user2.getUpdatedAt()
+        );
+
+        List<UserResponseDTO> expectedDtos = Arrays.asList(dto1, dto2);
+
+        when(userRepository.findAll()).thenReturn(users);
+        when(userMapper.toResponseDTOList(eq(users))).thenReturn(expectedDtos);
+
+        // Act
+        List<UserResponseDTO> result = userService.getUsers();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("joao@email.com", result.get(0).email());
+        assertEquals("maria@email.com", result.get(1).email());
+
+        verify(userRepository).findAll();
+        verify(userMapper).toResponseDTOList(users);
+        verifyNoMoreInteractions(userRepository, userMapper);
+    }
+
+    @Test
+    @DisplayName("getUsers - Should return a empty list when don't have users registered")
+    void getUsers_ShouldReturnEmptyList_WhenNoUsersExist() {
+        // Arrange
+        List<User> emptyList = Collections.emptyList();
+        List<UserResponseDTO> emptyDtoList = Collections.emptyList();
+
+        when(userRepository.findAll()).thenReturn(emptyList);
+        when(userMapper.toResponseDTOList(eq(emptyList))).thenReturn(emptyDtoList);
+
+        // Act
+        List<UserResponseDTO> result = userService.getUsers();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(userRepository).findAll();
+        verify(userMapper).toResponseDTOList(emptyList);
+        verifyNoMoreInteractions(userRepository, userMapper);
     }
 }
