@@ -22,10 +22,9 @@ import java.util.UUID;
 @Builder
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "full_name")
     private String name;
 
     @Column(nullable = false)
