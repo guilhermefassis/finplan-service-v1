@@ -24,16 +24,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    @Transactional
-    public UserResponseDTO createUser(UserRequestDTO request) {
-        if(userRepository.existsByEmail(request.email())){
-            throw new BusinessRuleException("Email already registered");
-        }
-        User user = userMapper.toEntity(request);
-        User savedUser = userRepository.saveAndFlush(user);
-        return userMapper.toResponseDTO(savedUser);
-    }
-
     public Page<UserResponseDTO> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(userMapper::toResponseDTO);
@@ -73,7 +63,7 @@ public class UserService {
         }
 
         if(request.paymentDetails() != null && !request.paymentDetails().isEmpty()) {
-            user.setPaymentFrequency(request.paymentFrequency());
+            user.setPaymentDetails(request.paymentDetails());
         }
 
         User updatedUser = userRepository.saveAndFlush(user);
