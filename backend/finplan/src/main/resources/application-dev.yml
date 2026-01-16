@@ -12,20 +12,23 @@ spring:
     url: jdbc:postgresql://aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require&preferQueryMode=simple
     user: postgres.uvajfkklrfudnkowkrzw
     password: ZY^ml64dpZmW
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://uvajfkklrfudnkowkrzw.supabase.co/auth/v1/.well-known/jwks.json
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
     open-in-view: false
-
 server:
   port: 8080
   servlet:
     context-path: /finplan/api/v1
-
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.flywaydb: DEBUG
+supabase:
+  auth:
+    audience: "authenticated"
