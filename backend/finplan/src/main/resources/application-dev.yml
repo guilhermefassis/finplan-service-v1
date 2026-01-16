@@ -32,3 +32,5 @@ logging:
 supabase:
   auth:
     audience: "authenticated"
+  url: https://uvajfkklrfudnkowkrzw.supabase.co
+  service-role-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YWpma2tscmZ1ZG5rb3drcnp3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzY0MDMyOCwiZXhwIjoyMDgzMjE2MzI4fQ.18R0JbEtj7-zv7rbdj41Hk0yJXnSKn7WhlLLs-JK4Js

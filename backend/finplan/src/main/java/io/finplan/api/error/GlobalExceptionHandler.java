@@ -5,6 +5,7 @@ import io.finplan.domain.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +71,25 @@ public class GlobalExceptionHandler {
         pd.setTitle("Unexpected error");
         pd.setDetail("An unexpected error occurred");
         pd.setType(URI.create("https://finplan/errors/internal"));
+        return pd;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        pd.setTitle("Unauthorized");
+        pd.setDetail("Authentication is required to access this resource: " + ex.getMessage());
+        pd.setType(URI.create("https://finplan/errors/unauthorized"));
+        return pd;
+    }
+
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ProblemDetail handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        pd.setTitle("Forbidden");
+        pd.setDetail("You do not have permission to access this resource");
+        pd.setType(URI.create("https://finplan/errors/forbidden"));
         return pd;
     }
 }

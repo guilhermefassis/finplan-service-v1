@@ -24,14 +24,14 @@ public class User {
     @Id
     private UUID id;
 
-    @Column(name = "full_name")
+    @Column
     private String name;
 
     @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_frequency", nullable = false, length = 20)
+    @Column(name = "payment_frequency", length = 20)
     private PaymentFrequency paymentFrequency;
 
     @JdbcTypeCode(SqlTypes.JSON)
