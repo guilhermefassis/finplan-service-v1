@@ -5,11 +5,13 @@ import io.finplan.domain.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.util.Map;
@@ -66,10 +68,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneric() {
+    public ProblemDetail handleGeneric(Exception ex) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         pd.setTitle("Unexpected error");
-        pd.setDetail("An unexpected error occurred");
+        pd.setDetail(ex.getMessage());
+        pd.setType(URI.create("https://finplan/errors/internal"));
+        return pd;
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNotFoundException(NoResourceFoundException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setTitle("Resource not found error");
+        pd.setDetail(ex.getMessage());
         pd.setType(URI.create("https://finplan/errors/internal"));
         return pd;
     }
@@ -90,6 +101,16 @@ public class GlobalExceptionHandler {
         pd.setTitle("Forbidden");
         pd.setDetail("You do not have permission to access this resource");
         pd.setType(URI.create("https://finplan/errors/forbidden"));
+        return pd;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Malformed or missing request body");
+        pd.setDetail(ex.getMessage());
+        pd.setType(URI.create("https://finplan/errors/bad-request"));
+
         return pd;
     }
 }

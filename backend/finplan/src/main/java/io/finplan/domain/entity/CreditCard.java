@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "credit_card")
+@Table(name = "credit_cards")
 @Getter
 @Setter
 public class CreditCard {
