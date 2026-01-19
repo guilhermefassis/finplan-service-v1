@@ -3,6 +3,7 @@ package io.finplan.domain.service.creditcard;
 
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
 import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
+import io.finplan.api.dto.creditcard.UpdateCreditCardDTO;
 import io.finplan.domain.entity.CreditCard;
 import io.finplan.domain.entity.User;
 import io.finplan.domain.exception.BusinessRuleException;
@@ -74,4 +75,31 @@ public class CreditCardService {
         return creditCardMapper.toListResponseDTO(creditCards);
     }
 
+    public ResponseCreditCardDTO updateCreditCard(UUID userId, UUID creditCardId, UpdateCreditCardDTO request) {
+        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
+                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+
+        if(request.name() != null) {
+            creditCard.setName(request.name());
+        }
+
+        if(request.brand() != null) {
+            creditCard.setBrand(request.brand());
+        }
+
+        if(request.creditLimit() != null) {
+            creditCard.setCreditLimit(request.creditLimit());
+        }
+
+        if(request.closingDay() != null) {
+            creditCard.setClosingDay(request.closingDay());
+        }
+
+        if(request.dueDay() != null) {
+            creditCard.setDueDay(request.dueDay());
+        }
+
+        CreditCard updatedCreditCard = creditCardRepository.saveAndFlush(creditCard);
+        return creditCardMapper.toResponseDTO(updatedCreditCard);
+    }
 }

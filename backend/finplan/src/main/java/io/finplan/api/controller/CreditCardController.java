@@ -3,9 +3,11 @@ package io.finplan.api.controller;
 
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
 import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
+import io.finplan.api.dto.creditcard.UpdateCreditCardDTO;
 import io.finplan.domain.service.creditcard.CreditCardService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -70,5 +72,16 @@ public class CreditCardController {
         UUID creditCardUuid = UUID.fromString(creditCardId);
 
         creditCardService.activateCreditCard(userId, creditCardUuid);
+    }
+
+    @PutMapping("/{creditCardId}")
+    public ResponseCreditCardDTO updateCreditCard(@AuthenticationPrincipal Jwt jwt,
+                                                  @Valid @RequestBody UpdateCreditCardDTO request,
+                                                  @PathVariable String creditCardId) {
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+        UUID creditCardUuid = UUID.fromString(creditCardId);
+
+        return creditCardService.updateCreditCard(userId, creditCardUuid, request);
     }
 }
