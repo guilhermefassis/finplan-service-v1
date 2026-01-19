@@ -36,6 +36,13 @@ public class CreditCardController {
         return creditCardService.getCreditCards(userUuid);
     }
 
+    @GetMapping("/disabled")
+    public List<ResponseCreditCardDTO> getDisabledCreditCards(@AuthenticationPrincipal Jwt jwt) {
+        String stringUserUuid = jwt.getSubject();
+        UUID userUuid = UUID.fromString(stringUserUuid);
+        return creditCardService.getDisabledCreditCards(userUuid);
+    }
+
     @GetMapping("/{creditCardId}")
     public ResponseCreditCardDTO getCreditCard(@AuthenticationPrincipal Jwt jwt, @PathVariable String creditCardId) {
         String stringUserId = jwt.getSubject();
@@ -43,5 +50,25 @@ public class CreditCardController {
         UUID creditCardUuid = UUID.fromString(creditCardId);
 
         return creditCardService.getCreditCard(userId, creditCardUuid);
+    }
+
+    @DeleteMapping("/{creditCardId}/disable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disableCreditCard(@AuthenticationPrincipal Jwt jwt, @PathVariable String creditCardId) {
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+        UUID creditCardUuid = UUID.fromString(creditCardId);
+
+        creditCardService.disableCreditCard(userId, creditCardUuid);
+    }
+
+    @PostMapping("/{creditCardId}/activate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void activateCreditCard(@AuthenticationPrincipal Jwt jwt, @PathVariable String creditCardId) {
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+        UUID creditCardUuid = UUID.fromString(creditCardId);
+
+        creditCardService.activateCreditCard(userId, creditCardUuid);
     }
 }

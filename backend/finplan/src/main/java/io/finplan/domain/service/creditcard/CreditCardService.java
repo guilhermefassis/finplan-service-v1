@@ -39,7 +39,7 @@ public class CreditCardService {
     }
 
     public List<ResponseCreditCardDTO> getCreditCards(UUID userId) {
-        List<CreditCard> creditCards = creditCardRepository.findByUserId(userId);
+        List<CreditCard> creditCards = creditCardRepository.findByUserIdAndActive(userId, true);
         return creditCardMapper.toListResponseDTO(creditCards);
     }
 
@@ -50,4 +50,28 @@ public class CreditCardService {
 
         return creditCardMapper.toResponseDTO(creditCard);
     }
+
+    public void disableCreditCard(UUID userId, UUID creditCardId) {
+        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
+                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+
+        creditCard.setActive(false);
+
+        creditCardRepository.save(creditCard);
+    }
+
+    public void activateCreditCard(UUID userId, UUID creditCardId) {
+        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
+                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+
+        creditCard.setActive(true);
+
+        creditCardRepository.save(creditCard);
+    }
+
+    public List<ResponseCreditCardDTO> getDisabledCreditCards(UUID userId) {
+        List<CreditCard> creditCards = creditCardRepository.findByUserIdAndActive(userId, false);
+        return creditCardMapper.toListResponseDTO(creditCards);
+    }
+
 }
