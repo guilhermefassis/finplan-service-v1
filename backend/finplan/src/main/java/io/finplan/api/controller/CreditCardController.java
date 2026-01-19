@@ -4,13 +4,14 @@ package io.finplan.api.controller;
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
 import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
 import io.finplan.domain.service.creditcard.CreditCardService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +21,7 @@ public class CreditCardController {
     private final CreditCardService creditCardService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseCreditCardDTO createCreditCard(@AuthenticationPrincipal Jwt jwt,
                                                   @Valid @RequestBody RequestCreditCardDTO request) {
         String stringUserUuid = jwt.getSubject();
@@ -27,9 +29,19 @@ public class CreditCardController {
         return creditCardService.createCreditCard(request, userUuid);
     }
 
-    @PostMapping("/test")
-    public String test(HttpServletRequest req) throws Exception {
-        System.out.println("LENGTH: " + req.getContentLength());
-        return new String(req.getInputStream().readAllBytes());
+    @GetMapping
+    public List<ResponseCreditCardDTO> getCreditCards(@AuthenticationPrincipal Jwt jwt) {
+        String stringUserUuid = jwt.getSubject();
+        UUID userUuid = UUID.fromString(stringUserUuid);
+        return creditCardService.getCreditCards(userUuid);
+    }
+
+    @GetMapping("/{creditCardId}")
+    public ResponseCreditCardDTO getCreditCard(@AuthenticationPrincipal Jwt jwt, @PathVariable String creditCardId) {
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+        UUID creditCardUuid = UUID.fromString(creditCardId);
+
+        return creditCardService.getCreditCard(userId, creditCardUuid);
     }
 }
