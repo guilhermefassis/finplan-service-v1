@@ -2,7 +2,7 @@ package io.finplan.api.controller;
 
 import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.api.dto.user.UserUpdateDTO;
-import io.finplan.domain.service.user.UserService;
+import io.finplan.domain.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

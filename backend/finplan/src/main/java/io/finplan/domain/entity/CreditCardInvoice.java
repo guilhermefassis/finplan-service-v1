@@ -28,7 +28,7 @@ public class CreditCardInvoice {
     private CreditCard creditCard;
 
     @Column(name = "reference_month", nullable = false)
-    private LocalDate referenceMonth;
+    private Integer referenceMonth;
 
     @Column(name = "closing_date", nullable = false)
     private LocalDate closingDate;

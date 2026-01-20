@@ -1,7 +1,7 @@
 package io.finplan.api.controller;
 
 import io.finplan.api.dto.register.RegisterRequest;
-import io.finplan.domain.service.register.RegisterService;
+import io.finplan.domain.service.RegisterService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

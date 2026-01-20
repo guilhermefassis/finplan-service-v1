@@ -1,4 +1,4 @@
-package io.finplan.domain.service.register;
+package io.finplan.domain.service;
 
 import io.finplan.api.dto.register.RegisterRequest;
 import io.finplan.domain.entity.User;

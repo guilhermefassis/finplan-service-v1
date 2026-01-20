@@ -1,4 +1,4 @@
-package io.finplan.domain.service.creditcard;
+package io.finplan.domain.service;
 
 
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
@@ -12,7 +12,6 @@ import io.finplan.domain.mapper.CreditCardMapper;
 import io.finplan.domain.repository.CreditCardRepository;
 import io.finplan.domain.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

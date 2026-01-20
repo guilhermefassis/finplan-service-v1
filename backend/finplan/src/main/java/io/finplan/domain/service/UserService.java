@@ -1,4 +1,4 @@
-package io.finplan.domain.service.user;
+package io.finplan.domain.service;
 
 import io.finplan.api.dto.user.UserResponseDTO;
 import io.finplan.api.dto.user.UserUpdateDTO;

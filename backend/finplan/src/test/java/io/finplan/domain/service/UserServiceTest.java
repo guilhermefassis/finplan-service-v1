@@ -9,7 +9,6 @@ import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.mapper.UserMapper;
 import io.finplan.domain.model.enums.PaymentFrequency;
 import io.finplan.domain.repository.UserRepository;
-import io.finplan.domain.service.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
