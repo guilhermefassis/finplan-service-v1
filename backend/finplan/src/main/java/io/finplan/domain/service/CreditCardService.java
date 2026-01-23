@@ -44,16 +44,13 @@ public class CreditCardService {
     }
 
     public ResponseCreditCardDTO getCreditCard(UUID userId, UUID creditCardId) {
-
-        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
-                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+        CreditCard creditCard = validateAndReturnCreditCardId(creditCardId, userId);
 
         return creditCardMapper.toResponseDTO(creditCard);
     }
 
     public void disableCreditCard(UUID userId, UUID creditCardId) {
-        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
-                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+        CreditCard creditCard = validateAndReturnCreditCardId(creditCardId, userId);
 
         creditCard.setActive(false);
 
@@ -61,8 +58,7 @@ public class CreditCardService {
     }
 
     public void activateCreditCard(UUID userId, UUID creditCardId) {
-        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
-                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+        CreditCard creditCard = validateAndReturnCreditCardId(creditCardId, userId);
 
         creditCard.setActive(true);
 
@@ -75,8 +71,7 @@ public class CreditCardService {
     }
 
     public ResponseCreditCardDTO updateCreditCard(UUID userId, UUID creditCardId, UpdateCreditCardDTO request) {
-        CreditCard creditCard = creditCardRepository.findByIdAndUserId(creditCardId, userId)
-                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
+        CreditCard creditCard = validateAndReturnCreditCardId(creditCardId, userId);
 
         if(request.name() != null) {
             creditCard.setName(request.name());
@@ -100,5 +95,10 @@ public class CreditCardService {
 
         CreditCard updatedCreditCard = creditCardRepository.saveAndFlush(creditCard);
         return creditCardMapper.toResponseDTO(updatedCreditCard);
+    }
+
+    public CreditCard validateAndReturnCreditCardId(UUID creditCardId, UUID userId) {
+        return creditCardRepository.findByIdAndUserId(creditCardId, userId)
+                .orElseThrow(() -> new BusinessRuleException("Credit Card not exists!"));
     }
 }

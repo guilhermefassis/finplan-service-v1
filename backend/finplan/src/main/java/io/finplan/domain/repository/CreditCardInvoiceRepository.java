@@ -9,16 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CreditCardInvoiceRepository extends JpaRepository<CreditCardInvoice, UUID> {
-    List<CreditCardInvoice> findByCreditCardId(UUID creditCardId);
-
-    List<CreditCardInvoice> findByCreditCardIdAndStatus(UUID creditCardId,
-                                                        String status);
     Optional<CreditCardInvoice> findByCreditCardIdAndReferenceMonth(UUID creditCardId,
-                                                                    LocalDate referenceMonth);
-    List<CreditCardInvoice> findByDueDateBetween(LocalDate startDate,
-                                                 LocalDate endDate);
-    List<CreditCardInvoice> findByCreditCardIdAndDueDateBetween(UUID creditCardId,
-                                                                LocalDate startDate,
-                                                                LocalDate endDate);
-    List<CreditCardInvoice> findByStatus(String status);
+                                                                    Integer referenceMonth);
 }

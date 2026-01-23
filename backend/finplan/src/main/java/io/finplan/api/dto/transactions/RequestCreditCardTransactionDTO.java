@@ -1,6 +1,7 @@
-package io.finplan.api.dto.transaction;
+package io.finplan.api.dto.transactions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.finplan.domain.model.enums.CreditCardTransactionCategory;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -21,8 +22,8 @@ public record RequestCreditCardTransactionDTO(
         @Size(max = 255, message = "Description must not exceed 255 characters")
         String description,
 
-        @Size(max = 50, message = "Category must not exceed 50 characters")
-        String category,
+        @NotNull(message = "Category is required")
+        CreditCardTransactionCategory category,
 
         @NotNull(message = "Amount is required")
         @DecimalMin(value = "0.01", message = "Amount must be greater than zero")

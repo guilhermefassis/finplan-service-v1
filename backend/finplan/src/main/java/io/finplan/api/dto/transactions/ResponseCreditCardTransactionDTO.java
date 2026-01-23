@@ -1,10 +1,11 @@
 package io.finplan.api.dto.transactions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.finplan.domain.model.enums.CreditCardTransactionCategory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 
@@ -15,13 +16,13 @@ public record ResponseCreditCardTransactionDTO(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate purchaseDate,
         String description,
-        String category,
+        CreditCardTransactionCategory category,
         BigDecimal amount,
         Boolean installments,
         Integer totalInstallments,
         Integer currentInstallment,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime createdAt,
+        OffsetDateTime createdAt,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime updatedAt
+        OffsetDateTime updatedAt
 ) {}
