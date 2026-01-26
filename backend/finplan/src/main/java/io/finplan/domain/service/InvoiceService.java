@@ -1,12 +1,15 @@
 package io.finplan.domain.service;
 
+import io.finplan.api.dto.invoice.ResponseInvoiceDTO;
 import io.finplan.common.utils.DateReferenceUtils;
 import io.finplan.domain.entity.CreditCard;
 import io.finplan.domain.entity.CreditCardInvoice;
-import io.finplan.domain.entity.CreditCardTransactions;
+import io.finplan.domain.exception.ResourceNotFoundException;
+import io.finplan.domain.mapper.InvoiceMapper;
 import io.finplan.domain.model.enums.StatusType;
 import io.finplan.domain.repository.CreditCardInvoiceRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InvoiceService {
     private final CreditCardInvoiceRepository invoiceRepository;
+    private final InvoiceMapper invoiceMapper;
 
     public CreditCardInvoice findOrCreateInvoice(CreditCard creditCard, Integer referenceMonth){
         return invoiceRepository
@@ -58,5 +62,21 @@ public class InvoiceService {
     public void sumTransactionAmountInInvoice(CreditCardInvoice invoice, BigDecimal amount) {
         invoice.setTotalAmount(invoice.getTotalAmount().add(amount));
         invoiceRepository.save(invoice);
+    }
+
+    public ResponseInvoiceDTO getInvoiceById(UUID cardId, UUID invoiceId, boolean includeTransactions) {
+        CreditCardInvoice invoice;
+
+        if(includeTransactions) {
+            invoice = invoiceRepository.findByIdAndCreditCardIdWithTransactions(invoiceId, cardId).orElseThrow(
+                    () -> new ResourceNotFoundException("Invoice not founded!")
+            );
+        } else {
+            invoice = invoiceRepository.findByIdAndCreditCardId(invoiceId, cardId).orElseThrow(
+                    () -> new ResourceNotFoundException("Invoice not founded!")
+            );
+        }
+
+        return invoiceMapper.toResponse(invoice, includeTransactions);
     }
 }

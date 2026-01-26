@@ -22,6 +22,7 @@ public record ResponseCreditCardTransactionDTO(
         Boolean installments,
         Integer totalInstallments,
         Integer currentInstallment,
+        BigDecimal totalPurchaseAmount,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         OffsetDateTime createdAt,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

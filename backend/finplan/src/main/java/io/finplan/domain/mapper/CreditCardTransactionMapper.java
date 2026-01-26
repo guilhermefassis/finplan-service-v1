@@ -51,6 +51,7 @@ public class CreditCardTransactionMapper extends BaseMapper {
                 request.isInstallments(),
                 request.getTotalInstallments(),
                 request.getCurrentInstallment(),
+                request.getTotalPurchaseAmount(),
                 request.getCreatedAt(),
                 request.getUpdatedAt()
         );

@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class CreditCardTransactionsService {
+public class TransactionsService {
 
     private final CreditCardTransactionRepository transactionRepository;
     private final CreditCardService creditCardService;

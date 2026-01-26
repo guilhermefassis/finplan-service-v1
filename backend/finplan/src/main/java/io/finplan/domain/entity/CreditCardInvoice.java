@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +27,9 @@ public class CreditCardInvoice {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "credit_card_id")
     private CreditCard creditCard;
+
+    @OneToMany(mappedBy = "creditCardInvoice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CreditCardTransactions> transactions;
 
     @Column(name = "reference_month", nullable = false)
     private Integer referenceMonth;

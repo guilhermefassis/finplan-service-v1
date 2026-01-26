@@ -7,7 +7,7 @@ import io.finplan.api.dto.creditcard.UpdateCreditCardDTO;
 import io.finplan.api.dto.transactions.RequestCreditCardTransactionDTO;
 import io.finplan.api.dto.transactions.ResponseCreditCardTransactionDTO;
 import io.finplan.domain.service.CreditCardService;
-import io.finplan.domain.service.CreditCardTransactionsService;
+import io.finplan.domain.service.TransactionsService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreditCardController {
     private final CreditCardService creditCardService;
-    private final CreditCardTransactionsService transactionService;
+    private final TransactionsService transactionService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
