@@ -22,6 +22,9 @@ public class CreditCardTransactions {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "group_id", nullable = false)
+    private UUID groupId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "credit_card_id", nullable = false)
     private CreditCard creditCard;

@@ -30,4 +30,11 @@ public class TransactionController {
         return transactionService.createCreditCardTransaction(request, userId);
     }
 
+
+    @DeleteMapping("/{groupId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTransaction(@PathVariable String groupId) {
+        UUID groupUuid = UUID.fromString(groupId);
+        transactionService.deleteCreditCardTransaction(groupUuid);
+    }
 }

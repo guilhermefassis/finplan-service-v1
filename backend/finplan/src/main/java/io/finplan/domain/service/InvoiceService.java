@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -49,7 +50,11 @@ public class InvoiceService {
                 });
     }
 
-
+    public void deductTransactionAmountInvoice(UUID invoiceId, BigDecimal amount) {
+        CreditCardInvoice invoice  = invoiceRepository.getReferenceById(invoiceId);
+        invoice.setTotalAmount(invoice.getTotalAmount().subtract(amount));
+        invoiceRepository.save(invoice);
+    }
     public void sumTransactionAmountInInvoice(CreditCardInvoice invoice, BigDecimal amount) {
         invoice.setTotalAmount(invoice.getTotalAmount().add(amount));
         invoiceRepository.save(invoice);
