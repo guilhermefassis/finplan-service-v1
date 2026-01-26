@@ -59,6 +59,7 @@ public class InvoiceService {
         invoice.setTotalAmount(invoice.getTotalAmount().subtract(amount));
         invoiceRepository.save(invoice);
     }
+
     public void sumTransactionAmountInInvoice(CreditCardInvoice invoice, BigDecimal amount) {
         invoice.setTotalAmount(invoice.getTotalAmount().add(amount));
         invoiceRepository.save(invoice);
@@ -73,6 +74,26 @@ public class InvoiceService {
             );
         } else {
             invoice = invoiceRepository.findByIdAndCreditCardId(invoiceId, cardId).orElseThrow(
+                    () -> new ResourceNotFoundException("Invoice not founded!")
+            );
+        }
+
+        return invoiceMapper.toResponse(invoice, includeTransactions);
+    }
+
+    public ResponseInvoiceDTO getInvoiceByReferenceDate(
+            UUID cardId,
+            Integer referenceDate,
+            boolean includeTransactions
+    ){
+        CreditCardInvoice invoice;
+
+        if(includeTransactions) {
+            invoice = invoiceRepository.findByReferenceMonthAndCreditCardIdWithTransactions(referenceDate, cardId).orElseThrow(
+                    () -> new ResourceNotFoundException("Invoice not founded!")
+            );
+        } else {
+            invoice = invoiceRepository.findByReferenceMonthAndCreditCardId(referenceDate, cardId).orElseThrow(
                     () -> new ResourceNotFoundException("Invoice not founded!")
             );
         }

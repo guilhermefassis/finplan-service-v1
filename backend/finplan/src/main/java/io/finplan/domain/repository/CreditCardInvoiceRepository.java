@@ -27,4 +27,18 @@ public interface CreditCardInvoiceRepository extends JpaRepository<CreditCardInv
             @Param("id") UUID id,
             @Param("cardId") UUID cardId
     );
+
+    Optional<CreditCardInvoice> findByReferenceMonthAndCreditCardId(Integer referenceMonth, UUID creditCardId);
+
+    @Query("""
+       SELECT i\s
+       FROM CreditCardInvoice i\s
+       LEFT JOIN FETCH i.transactions\s
+       WHERE i.referenceMonth = :referenceMonth\s
+         AND i.creditCard.id = :cardId
+      \s""")
+    Optional<CreditCardInvoice> findByReferenceMonthAndCreditCardIdWithTransactions(
+            @Param("referenceMonth") Integer referenceMonth,
+            @Param("cardId") UUID cardId
+    );
 }

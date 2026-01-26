@@ -15,7 +15,7 @@ public class CreditCardInvoiceController {
     private final InvoiceService invoiceService;
 
     @GetMapping("/{invoiceId}")
-    public ResponseInvoiceDTO getInvoiceDetails(
+    public ResponseInvoiceDTO getInvoiceDetailsById(
             @PathVariable UUID cardId,
             @PathVariable UUID invoiceId,
             @RequestParam(defaultValue = "false") boolean includeTransactions) {
@@ -27,4 +27,12 @@ public class CreditCardInvoiceController {
         );
     }
 
+    @GetMapping
+    public ResponseInvoiceDTO getInvoiceDetailsByDate(
+            @PathVariable UUID cardId,
+            @RequestParam Integer referenceDate,
+            @RequestParam(defaultValue = "false") boolean includeTransactions) {
+
+        return invoiceService.getInvoiceByReferenceDate(cardId, referenceDate, includeTransactions);
+    }
 }
