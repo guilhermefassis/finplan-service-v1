@@ -10,8 +10,6 @@ import java.util.UUID;
 
 
 public record RequestCreditCardTransactionDTO(
-
-        @NotNull(message = "Credit card ID is required")
         UUID creditCardId,
 
         @NotNull(message = "Purchase date is required")

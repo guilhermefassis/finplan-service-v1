@@ -29,8 +29,12 @@ public class CreditCardTransactionsService {
     private final InvoiceService invoiceService;
 
     @Transactional
-    public ResponseCreditCardTransactionDTO createCreditCardTransaction(RequestCreditCardTransactionDTO request, UUID userId) {
-        CreditCard creditCard = creditCardService.validateAndReturnCreditCardId(request.creditCardId(), userId);
+    public ResponseCreditCardTransactionDTO createCreditCardTransaction(
+            RequestCreditCardTransactionDTO request,
+            UUID userId,
+            UUID creditCardId
+    ) {
+        CreditCard creditCard = creditCardService.validateAndReturnCreditCardId(creditCardId, userId);
         Integer firstInvoiceDate = getDateOfFirstInvoice(request.purchaseDate(), creditCard.getClosingDay());
         CreditCardTransactions transactionToReturn = null;
         CreditCardTransactions lastSaved = null;

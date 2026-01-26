@@ -4,6 +4,7 @@ package io.finplan.api.controller;
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
 import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
 import io.finplan.api.dto.creditcard.UpdateCreditCardDTO;
+import io.finplan.api.dto.transactions.RequestCreditCardTransactionDTO;
 import io.finplan.api.dto.transactions.ResponseCreditCardTransactionDTO;
 import io.finplan.domain.service.CreditCardService;
 import io.finplan.domain.service.CreditCardTransactionsService;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreditCardController {
     private final CreditCardService creditCardService;
-    private final CreditCardTransactionsService transactionsService;
+    private final CreditCardTransactionsService transactionService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -94,6 +95,26 @@ public class CreditCardController {
     ) {
         String stringUserId = jwt.getSubject();
         UUID userId = UUID.fromString(stringUserId);
-        return transactionsService.getTransactionByCreditCard(creditCardId, userId);
+        return transactionService.getTransactionByCreditCard(creditCardId, userId);
+    }
+
+    @PostMapping("/{creditCardId}/transaction")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseCreditCardTransactionDTO createTransaction(@AuthenticationPrincipal Jwt jwt,
+                                                              @Valid @RequestBody RequestCreditCardTransactionDTO request,
+                                                              @PathVariable UUID creditCardId) {
+
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+
+        return transactionService.createCreditCardTransaction(request, userId, creditCardId);
+    }
+
+
+    @DeleteMapping("/{groupId}/transaction")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTransaction(@PathVariable String groupId) {
+        UUID groupUuid = UUID.fromString(groupId);
+        transactionService.deleteCreditCardTransaction(groupUuid);
     }
 }
