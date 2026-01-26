@@ -23,7 +23,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreditCardController {
     private final CreditCardService creditCardService;
-    private final TransactionsService transactionService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -86,35 +85,5 @@ public class CreditCardController {
         UUID creditCardUuid = UUID.fromString(creditCardId);
 
         return creditCardService.updateCreditCard(userId, creditCardUuid, request);
-    }
-
-    @GetMapping("/{creditCardId}/transaction")
-    public List<ResponseCreditCardTransactionDTO> getAllCreditCardTransactions(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable UUID creditCardId
-    ) {
-        String stringUserId = jwt.getSubject();
-        UUID userId = UUID.fromString(stringUserId);
-        return transactionService.getTransactionByCreditCard(creditCardId, userId);
-    }
-
-    @PostMapping("/{creditCardId}/transaction")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseCreditCardTransactionDTO createTransaction(@AuthenticationPrincipal Jwt jwt,
-                                                              @Valid @RequestBody RequestCreditCardTransactionDTO request,
-                                                              @PathVariable UUID creditCardId) {
-
-        String stringUserId = jwt.getSubject();
-        UUID userId = UUID.fromString(stringUserId);
-
-        return transactionService.createCreditCardTransaction(request, userId, creditCardId);
-    }
-
-
-    @DeleteMapping("/{groupId}/transaction")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTransaction(@PathVariable String groupId) {
-        UUID groupUuid = UUID.fromString(groupId);
-        transactionService.deleteCreditCardTransaction(groupUuid);
     }
 }

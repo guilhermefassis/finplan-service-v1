@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CreditCardTransactionRepository extends JpaRepository<CreditCardTransactions, UUID> {
-    List<CreditCardTransactions> findByGroupId(UUID groupId);
+    List<CreditCardTransactions> findByGroupIdAndCreditCard_Id(UUID groupId, UUID cardId);
     List<CreditCardTransactions> findByCreditCardId(UUID creditCardId);
     @Modifying
     @Transactional

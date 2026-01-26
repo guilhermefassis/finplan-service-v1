@@ -5,9 +5,9 @@ import io.finplan.common.utils.DateReferenceUtils;
 import io.finplan.domain.entity.CreditCard;
 import io.finplan.domain.entity.CreditCardInvoice;
 import io.finplan.domain.entity.CreditCardTransactions;
+import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.mapper.CreditCardTransactionMapper;
 import io.finplan.domain.repository.CreditCardTransactionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,9 +50,9 @@ public class TransactionsService {
             transaction.setCurrentInstallment(currentInstallment);
             transaction.setCreditCardInvoice(invoice);
             if(currentInstallment == request.currentInstallment()) {
-                transactionToReturn = transactionRepository.saveAndFlush(transaction);;
+                transactionToReturn = transactionRepository.saveAndFlush(transaction);
             } else {
-                lastSaved = transactionRepository.save(transaction);;
+                lastSaved = transactionRepository.save(transaction);
             }
 
             invoiceService.sumTransactionAmountInInvoice(invoice, transaction.getAmount());
@@ -64,13 +64,11 @@ public class TransactionsService {
     }
 
     @Transactional
-    public void deleteCreditCardTransaction(UUID groupId) {
-        List<CreditCardTransactions> transactions = transactionRepository.findByGroupId(groupId);
-
-        // TODO: validate user to delete transactions
+    public void deleteCreditCardTransaction(UUID cardId, UUID groupId) {
+        List<CreditCardTransactions> transactions = transactionRepository.findByGroupIdAndCreditCard_Id(groupId, cardId);
 
         if (transactions.isEmpty()) {
-            throw new EntityNotFoundException("Any transaction as founded.");
+            throw new ResourceNotFoundException("Any transaction as founded.");
         }
 
         for(CreditCardTransactions transaction: transactions) {
