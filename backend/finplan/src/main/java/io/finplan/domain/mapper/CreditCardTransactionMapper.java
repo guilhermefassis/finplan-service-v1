@@ -41,6 +41,7 @@ public class CreditCardTransactionMapper extends BaseMapper {
                 request.getId(),
                 request.getCreditCard().getId(),
                 request.getCreditCardInvoice().getId(),
+                request.getGroupId(),
                 request.getPurchaseDate(),
                 request.getDescription(),
                 request.getCategory(),

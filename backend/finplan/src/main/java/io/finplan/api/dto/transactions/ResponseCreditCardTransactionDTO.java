@@ -13,6 +13,7 @@ public record ResponseCreditCardTransactionDTO(
         UUID id,
         UUID creditCardId,
         UUID invoiceId,
+        UUID groupId,
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate purchaseDate,
         String description,
