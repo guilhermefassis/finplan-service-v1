@@ -1,7 +1,6 @@
 package io.finplan.domain.service;
 
 
-import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
 import io.finplan.common.utils.DateReferenceUtils;
 import io.finplan.domain.entity.CreditCard;
 import io.finplan.domain.entity.CreditCardInvoice;
@@ -64,6 +63,8 @@ public class CreditCardTransactionsService {
     public void deleteCreditCardTransaction(UUID groupId) {
         List<CreditCardTransactions> transactions = transactionRepository.findByGroupId(groupId);
 
+        // TODO: validate user to delete transactions
+
         if (transactions.isEmpty()) {
             throw new EntityNotFoundException("Any transaction as founded.");
         }
@@ -79,6 +80,11 @@ public class CreditCardTransactionsService {
         transactionRepository.deleteByGroupId(groupId);
     }
 
+    public List<ResponseCreditCardTransactionDTO> getTransactionByCreditCard(UUID creditCardId, UUID userId) {
+        CreditCard creditCard = creditCardService.validateAndReturnCreditCardId(creditCardId, userId);
+        List<CreditCardTransactions> transactions = transactionRepository.findByCreditCardId(creditCard.getId());
+        return transactionMapper.toListResponseDTO(transactions);
+    }
 
     private Integer calculusNextMonth(Integer referenceDate, int monthsToSum) {
         YearMonth baseDate = DateReferenceUtils.fromReference(referenceDate);

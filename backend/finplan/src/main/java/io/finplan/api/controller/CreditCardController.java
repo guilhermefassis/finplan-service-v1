@@ -4,7 +4,9 @@ package io.finplan.api.controller;
 import io.finplan.api.dto.creditcard.RequestCreditCardDTO;
 import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
 import io.finplan.api.dto.creditcard.UpdateCreditCardDTO;
+import io.finplan.api.dto.transactions.ResponseCreditCardTransactionDTO;
 import io.finplan.domain.service.CreditCardService;
+import io.finplan.domain.service.CreditCardTransactionsService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreditCardController {
     private final CreditCardService creditCardService;
+    private final CreditCardTransactionsService transactionsService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -82,5 +85,15 @@ public class CreditCardController {
         UUID creditCardUuid = UUID.fromString(creditCardId);
 
         return creditCardService.updateCreditCard(userId, creditCardUuid, request);
+    }
+
+    @GetMapping("/{creditCardId}/transaction")
+    public List<ResponseCreditCardTransactionDTO> getAllCreditCardTransactions(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID creditCardId
+    ) {
+        String stringUserId = jwt.getSubject();
+        UUID userId = UUID.fromString(stringUserId);
+        return transactionsService.getTransactionByCreditCard(creditCardId, userId);
     }
 }

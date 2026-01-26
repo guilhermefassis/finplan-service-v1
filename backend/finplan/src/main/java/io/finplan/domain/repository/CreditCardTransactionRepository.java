@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface CreditCardTransactionRepository extends JpaRepository<CreditCardTransactions, UUID> {
     List<CreditCardTransactions> findByGroupId(UUID groupId);
-
+    List<CreditCardTransactions> findByCreditCardId(UUID creditCardId);
     @Modifying
     @Transactional
     void deleteByGroupId(UUID groupId);

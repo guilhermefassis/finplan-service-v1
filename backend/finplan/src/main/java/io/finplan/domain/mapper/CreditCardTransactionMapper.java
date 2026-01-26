@@ -1,6 +1,7 @@
 package io.finplan.domain.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.finplan.api.dto.creditcard.ResponseCreditCardDTO;
 import io.finplan.api.dto.transactions.RequestCreditCardTransactionDTO;
 import io.finplan.api.dto.transactions.ResponseCreditCardTransactionDTO;
 import io.finplan.domain.entity.CreditCard;
@@ -8,6 +9,7 @@ import io.finplan.domain.entity.CreditCardTransactions;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 public class CreditCardTransactionMapper extends BaseMapper {
@@ -54,4 +56,9 @@ public class CreditCardTransactionMapper extends BaseMapper {
         );
     }
 
+    public List<ResponseCreditCardTransactionDTO> toListResponseDTO(List<CreditCardTransactions> transactions) {
+        return transactions.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
 }
