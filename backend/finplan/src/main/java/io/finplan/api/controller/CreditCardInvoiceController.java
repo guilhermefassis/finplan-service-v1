@@ -1,6 +1,7 @@
 package io.finplan.api.controller;
 
 import io.finplan.api.dto.invoice.ResponseInvoiceDTO;
+import io.finplan.api.dto.invoice.UpdateInvoiceDTO;
 import io.finplan.domain.service.InvoiceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -40,4 +41,20 @@ public class CreditCardInvoiceController {
 
         return invoiceService.getInvoicesByCreditCard(cardId);
     }
+
+    @PostMapping("/{invoiceId}/process-status")
+    public ResponseInvoiceDTO validateInvoiceStatus(
+            @PathVariable UUID cardId,
+            @PathVariable UUID invoiceId) {
+        return invoiceService.validateAndChangeInvoiceStatus(invoiceId, cardId);
+    }
+
+    @PostMapping("/{invoiceId}/pay")
+    public ResponseInvoiceDTO payInvoice(
+            @PathVariable UUID cardId,
+            @PathVariable UUID invoiceId,
+            @RequestBody UpdateInvoiceDTO request) {
+        return invoiceService.payInvoice(invoiceId, cardId, request);
+    }
+
 }
