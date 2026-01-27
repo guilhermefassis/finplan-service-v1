@@ -1,0 +1,1140 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Financial Planning API",
+        "description": "First version of the personal financial planning API.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080/finplan/api/v1",
+            "description": "Generated server url"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/users": {
+            "put": {
+                "tags": [
+                    "user-controller"
+                ],
+                "operationId": "updateUser",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserUpdateDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponseDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{creditCardId}": {
+            "get": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "getCreditCard",
+                "parameters": [
+                    {
+                        "name": "creditCardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseCreditCardDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "updateCreditCard",
+                "parameters": [
+                    {
+                        "name": "creditCardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCreditCardDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseCreditCardDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards": {
+            "get": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "getCreditCards",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ResponseCreditCardDTO"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "createCreditCard",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestCreditCardDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseCreditCardDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{creditCardId}/activate": {
+            "post": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "activateCreditCard",
+                "parameters": [
+                    {
+                        "name": "creditCardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/transactions": {
+            "get": {
+                "tags": [
+                    "credit-card-transaction-controller"
+                ],
+                "operationId": "getAllCreditCardTransactions",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ResponseCreditCardTransactionDTO"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "credit-card-transaction-controller"
+                ],
+                "operationId": "createTransaction",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestCreditCardTransactionDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseCreditCardTransactionDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/invoices/{invoiceId}/process-status": {
+            "post": {
+                "tags": [
+                    "credit-card-invoice-controller"
+                ],
+                "operationId": "validateInvoiceStatus",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInvoiceDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/invoices/{invoiceId}/pay": {
+            "post": {
+                "tags": [
+                    "credit-card-invoice-controller"
+                ],
+                "operationId": "payInvoice",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateInvoiceDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInvoiceDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "auth-controller"
+                ],
+                "operationId": "register",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "tags": [
+                    "user-controller"
+                ],
+                "operationId": "getUser",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponseDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "tags": [
+                    "health-controller"
+                ],
+                "operationId": "health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health/me": {
+            "get": {
+                "tags": [
+                    "health-controller"
+                ],
+                "operationId": "me",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/invoices": {
+            "get": {
+                "tags": [
+                    "credit-card-invoice-controller"
+                ],
+                "operationId": "getInvoiceDetailsByDate",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "referenceDate",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "includeTransactions",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ResponseInvoiceDTO"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/invoices/{invoiceId}": {
+            "get": {
+                "tags": [
+                    "credit-card-invoice-controller"
+                ],
+                "operationId": "getInvoiceDetailsById",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "includeTransactions",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInvoiceDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/disabled": {
+            "get": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "getDisabledCreditCards",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ResponseCreditCardDTO"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/balances/cards": {
+            "get": {
+                "tags": [
+                    "balance-controller"
+                ],
+                "operationId": "getMonthlyBalance",
+                "parameters": [
+                    {
+                        "name": "referenceDate",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseBalanceDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/credit-cards/{creditCardId}/disable": {
+            "delete": {
+                "tags": [
+                    "credit-card-controller"
+                ],
+                "operationId": "disableCreditCard",
+                "parameters": [
+                    {
+                        "name": "creditCardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/credit-cards/{cardId}/transactions/{groupId}": {
+            "delete": {
+                "tags": [
+                    "credit-card-transaction-controller"
+                ],
+                "operationId": "deleteTransaction",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "UserUpdateDTO": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 3
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "paymentFrequency": {
+                        "type": "string",
+                        "enum": [
+                            "MONTHLY",
+                            "BIWEEKLY",
+                            "WEEKLY",
+                            "DAILY"
+                        ]
+                    },
+                    "paymentDetails": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                }
+            },
+            "UserResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "paymentFrequency": {
+                        "type": "string",
+                        "enum": [
+                            "MONTHLY",
+                            "BIWEEKLY",
+                            "WEEKLY",
+                            "DAILY"
+                        ]
+                    },
+                    "paymentDetails": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "UpdateCreditCardDTO": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "brand": {
+                        "type": "string"
+                    },
+                    "closingDay": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 31,
+                        "minimum": 1
+                    },
+                    "dueDay": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 31,
+                        "minimum": 1
+                    },
+                    "creditLimit": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                }
+            },
+            "ResponseCreditCardDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "brand": {
+                        "type": "string"
+                    },
+                    "closingDay": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "dueDay": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "creditLimit": {
+                        "type": "number"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "RequestCreditCardDTO": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "brand": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "closingDay": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 31,
+                        "minimum": 1
+                    },
+                    "dueDay": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 31,
+                        "minimum": 1
+                    },
+                    "creditLimit": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                },
+                "required": [
+                    "brand",
+                    "closingDay",
+                    "creditLimit",
+                    "dueDay",
+                    "name"
+                ]
+            },
+            "RequestCreditCardTransactionDTO": {
+                "type": "object",
+                "properties": {
+                    "creditCardId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "purchaseDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "FOOD_AND_DINING",
+                            "GROCERIES",
+                            "TRANSPORTATION",
+                            "FUEL",
+                            "HOUSING",
+                            "UTILITIES",
+                            "HEALTH_AND_FITNESS",
+                            "EDUCATION",
+                            "ENTERTAINMENT",
+                            "SHOPPING",
+                            "CLOTHING",
+                            "ELECTRONICS",
+                            "TRAVEL",
+                            "SUBSCRIPTIONS",
+                            "STREAMING_SERVICES",
+                            "PERSONAL_CARE",
+                            "PETS",
+                            "GIFTS_AND_DONATIONS",
+                            "INVESTMENTS",
+                            "TAXES",
+                            "OTHERS"
+                        ]
+                    },
+                    "amount": {
+                        "type": "number",
+                        "minimum": 0.01
+                    },
+                    "installments": {
+                        "type": "boolean"
+                    },
+                    "totalInstallments": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 48,
+                        "minimum": 1
+                    },
+                    "currentInstallment": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "amount",
+                    "category",
+                    "description",
+                    "installments",
+                    "purchaseDate"
+                ]
+            },
+            "ResponseCreditCardTransactionDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "creditCardId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "invoiceId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "groupId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "purchaseDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "FOOD_AND_DINING",
+                            "GROCERIES",
+                            "TRANSPORTATION",
+                            "FUEL",
+                            "HOUSING",
+                            "UTILITIES",
+                            "HEALTH_AND_FITNESS",
+                            "EDUCATION",
+                            "ENTERTAINMENT",
+                            "SHOPPING",
+                            "CLOTHING",
+                            "ELECTRONICS",
+                            "TRAVEL",
+                            "SUBSCRIPTIONS",
+                            "STREAMING_SERVICES",
+                            "PERSONAL_CARE",
+                            "PETS",
+                            "GIFTS_AND_DONATIONS",
+                            "INVESTMENTS",
+                            "TAXES",
+                            "OTHERS"
+                        ]
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "installments": {
+                        "type": "boolean"
+                    },
+                    "totalInstallments": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "currentInstallment": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalPurchaseAmount": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ResponseInvoiceDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "creditCardId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "referenceMonth": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "closingDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "totalAmount": {
+                        "type": "number"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "OPEN",
+                            "CLOSED",
+                            "PAID",
+                            "OVERDUE"
+                        ]
+                    },
+                    "paymentDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseCreditCardTransactionDTO"
+                        }
+                    }
+                }
+            },
+            "UpdateInvoiceDTO": {
+                "type": "object",
+                "properties": {
+                    "paymentDate": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                }
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "fullName": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ResponseBalanceCreditCardDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "brand": {
+                        "type": "string"
+                    },
+                    "creditLimit": {
+                        "type": "number"
+                    },
+                    "invoice": {
+                        "$ref": "#/components/schemas/ResponseBalanceInvoiceDTO"
+                    }
+                }
+            },
+            "ResponseBalanceDTO": {
+                "type": "object",
+                "properties": {
+                    "referenceMonth": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalInvoicesAmount": {
+                        "type": "number"
+                    },
+                    "cards": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseBalanceCreditCardDTO"
+                        }
+                    }
+                }
+            },
+            "ResponseBalanceInvoiceDTO": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "referenceMonth": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "closingDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "totalAmount": {
+                        "type": "number"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "OPEN",
+                            "CLOSED",
+                            "PAID",
+                            "OVERDUE"
+                        ]
+                    },
+                    "paymentDate": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
