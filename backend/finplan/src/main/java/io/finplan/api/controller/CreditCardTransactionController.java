@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/credit-cards/{cardId}/transaction")
+@RequestMapping("/credit-cards/{cardId}/transactions")
 @AllArgsConstructor
 public class CreditCardTransactionController {
 
