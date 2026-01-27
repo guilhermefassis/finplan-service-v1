@@ -7,6 +7,8 @@ import io.finplan.domain.entity.CreditCardTransactions;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 
 @Component
 public class InvoiceMapper {
@@ -50,5 +52,12 @@ public class InvoiceMapper {
                 transaction.getCreatedAt(),
                 transaction.getUpdatedAt()
         );
+    }
+
+    public List<ResponseInvoiceDTO> toListResponseDTO(List<CreditCardInvoice> invoices, boolean includeTransactions) {
+        return invoices
+                .stream()
+                .map(invoice -> toResponse(invoice, includeTransactions))
+                .toList();
     }
 }

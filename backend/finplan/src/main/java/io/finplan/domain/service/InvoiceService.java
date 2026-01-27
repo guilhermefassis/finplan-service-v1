@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -81,7 +82,7 @@ public class InvoiceService {
         return invoiceMapper.toResponse(invoice, includeTransactions);
     }
 
-    public ResponseInvoiceDTO getInvoiceByReferenceDate(
+    public List<ResponseInvoiceDTO> getInvoiceByReferenceDate(
             UUID cardId,
             Integer referenceDate,
             boolean includeTransactions
@@ -98,6 +99,11 @@ public class InvoiceService {
             );
         }
 
-        return invoiceMapper.toResponse(invoice, includeTransactions);
+        return List.of(invoiceMapper.toResponse(invoice, includeTransactions));
+    }
+
+    public List<ResponseInvoiceDTO> getInvoicesByCreditCard(UUID cardId) {
+        List<CreditCardInvoice> invoices = invoiceRepository.findByCreditCardId(cardId);
+        return invoiceMapper.toListResponseDTO(invoices, false);
     }
 }

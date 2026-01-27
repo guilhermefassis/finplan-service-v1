@@ -5,6 +5,7 @@ import io.finplan.domain.service.InvoiceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,11 +29,15 @@ public class CreditCardInvoiceController {
     }
 
     @GetMapping
-    public ResponseInvoiceDTO getInvoiceDetailsByDate(
+    public List<ResponseInvoiceDTO> getInvoiceDetailsByDate(
             @PathVariable UUID cardId,
-            @RequestParam Integer referenceDate,
+            @RequestParam(required = false) Integer referenceDate,
             @RequestParam(defaultValue = "false") boolean includeTransactions) {
 
-        return invoiceService.getInvoiceByReferenceDate(cardId, referenceDate, includeTransactions);
+        if(referenceDate != null) {
+            return invoiceService.getInvoiceByReferenceDate(cardId, referenceDate, includeTransactions);
+        }
+
+        return invoiceService.getInvoicesByCreditCard(cardId);
     }
 }
