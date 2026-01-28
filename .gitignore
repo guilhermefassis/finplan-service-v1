@@ -96,6 +96,7 @@ docker-data/
 **/*.iws
 **/*.ipr
 **/out/
+**/.env*
 
 # Eclipse
 **/.classpath
