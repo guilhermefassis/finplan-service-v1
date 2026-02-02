@@ -18,26 +18,27 @@ import {
   mockInvoices,
   mockBalance 
 } from '../mock-data';
+import { getSession } from 'next-auth/react';
 
 // Configuration
 const DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'mock';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/finplan/api/v1';
 
 // Helper function to simulate API delay
-const delay = (ms: number = 300) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number = 0) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper function to get auth token (for future API integration)
-const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('authToken');
+const getAuthToken = async (): Promise<string | null> => {
+  const session = await getSession();
+  return (session as any)?.supabaseAccessToken;
 };
 
 // Helper function to make API calls (for future use)
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
-  const token = getAuthToken();
+  const token = await getAuthToken();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {Authorization: "vazio"}),
     ...(options.headers || {}),
   };
 
@@ -58,13 +59,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
 export const userApi = {
   async getMe(): Promise<User> {
     await delay();
-    
-    if (DATA_MODE === 'api') {
-      return apiCall('/users/me');
-    }
-    
-    // Mock implementation
-    return mockUsers[0];
+    return apiCall('/users/me');
   },
 
   async updateUser(data: UserUpdateDTO): Promise<User> {

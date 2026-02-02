@@ -42,41 +42,41 @@ backend/**/application-secrets.yml
 backend/**/.env
 
 # ============================================
-# FRONTEND (Next.js / Node.js)
+# frontendEND (Next.js / Node.js)
 # ============================================
 
 # Dependencies
-front/**/node_modules/
-front/**/.pnp
-front/**/.pnp.js
+frontend/**/node_modules/
+frontend/**/.pnp
+frontend/**/.pnp.js
 
 # Testing
-front/**/coverage/
-front/**/.nyc_output
+frontend/**/coverage/
+frontend/**/.nyc_output
 
 # Next.js
-front/**/.next/
-front/**/out/
-front/**/build/
-front/**/.vercel
-
+frontend/**/.next/
+frontend/**/out/
+frontend/**/build/
+frontend/**/.vercel
+**/.next
 # Production
-front/**/dist/
+frontend/**/dist/
 
 # Environment variables
-front/**/.env
-front/**/.env*.local
-front/**/.env.local
-front/**/.env.development.local
-front/**/.env.test.local
-front/**/.env.production.local
+frontend/**/.env
+frontend/**/.env*.local
+frontend/**/.env.local
+frontend/**/.env.development.local
+frontend/**/.env.test.local
+frontend/**/.env.production.local
 
 # Logs
-front/**/npm-debug.log*
-front/**/yarn-debug.log*
-front/**/yarn-error.log*
-front/**/pnpm-debug.log*
-front/**/lerna-debug.log*
+frontend/**/npm-debug.log*
+frontend/**/yarn-debug.log*
+frontend/**/yarn-error.log*
+frontend/**/pnpm-debug.log*
+frontend/**/lerna-debug.log*
 
 # ============================================
 # DOCKER
