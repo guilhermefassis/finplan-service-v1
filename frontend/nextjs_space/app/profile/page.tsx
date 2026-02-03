@@ -198,9 +198,6 @@ export default function ProfilePage() {
                 <h3 className="text-sm font-medium mb-2">Informações da Conta</h3>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p>
-                    <span className="font-medium">ID:</span> {user?.id ?? 'N/A'}
-                  </p>
-                  <p>
                     <span className="font-medium">Criado em:</span>{' '}
                     {user?.createdAt
                       ? new Date(user.createdAt).toLocaleDateString('pt-BR')
