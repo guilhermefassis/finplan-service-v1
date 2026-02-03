@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Loader2, Calendar } from 'lucide-react';
 import { invoiceApi, creditCardApi } from '@/lib/services/api';
-import { Invoice, CreditCard, STATUS_LABELS, InvoiceStatus } from '@/lib/types';
+import { Invoice, CreditCard, STATUS_LABELS, InvoiceStatus, CATEGORY_LABELS } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -290,26 +290,40 @@ export default function InvoicesPage() {
 
                       {invoice?.transactions && invoice.transactions.length > 0 && (
                         <div className="mt-4">
-                          <h4 className="text-sm font-medium mb-2">Transações:</h4>
-                          <div className="space-y-2 max-h-48 overflow-y-auto">
-                            {invoice.transactions?.map?.((transaction) => (
+                          <h4 className="text-sm font-medium mb-3 text-muted-foreground">Transações:</h4>
+                          <div className="space-y-3 max-h-60 overflow-y-auto pr-2 scrollbar-hide">
+                            {invoice.transactions.map((transaction) => (
                               <div
                                 key={transaction?.id ?? ''}
-                                className="flex justify-between items-center text-sm border-l-2 border-primary pl-3 py-1"
+                                className="flex justify-between items-center text-sm border-l-2 border-primary/50 hover:border-primary pl-3 py-1 transition-colors"
                               >
-                                <span>{transaction?.description ?? 'Transação'}</span>
-                                <span className="font-medium">
-                                  {new Intl.NumberFormat('pt-BR', {
-                                    style: 'currency',
-                                    currency: 'BRL',
-                                  }).format(transaction?.amount ?? 0)}
-                                </span>
+                                <div className="flex flex-col">
+                                  <span className="font-medium text-foreground">
+                                    {transaction?.description ?? 'Transação'}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                                    {CATEGORY_LABELS[transaction?.category]}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-4 text-right">
+                                  {transaction?.installments && (
+                                    <span className="text-[11px] font-bold bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full border border-border">
+                                      {transaction?.currentInstallment}/{transaction?.totalInstallments}
+                                    </span>
+                                  )}
+                                  
+                                  <span className="font-semibold text-foreground min-w-[80px]">
+                                    {new Intl.NumberFormat('pt-BR', {
+                                      style: 'currency',
+                                      currency: 'BRL',
+                                    }).format(transaction?.amount ?? 0)}
+                                  </span>
+                                </div>
                               </div>
-                            )) ?? null}
+                            ))}
                           </div>
                         </div>
                       )}
-
                       {invoice?.status !== InvoiceStatus.PAID && (
                         <Button
                           onClick={() => handlePayInvoice(invoice)}
