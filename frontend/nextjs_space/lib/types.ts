@@ -151,12 +151,15 @@ export interface BalanceCreditCard {
   name: string;
   brand: string;
   creditLimit: number;
+  usageLimit: number,
+  availableLimit: number,
   invoice?: BalanceInvoice;
 }
 
 export interface Balance {
   referenceMonth: number;
   totalInvoicesAmount: number;
+  totalCreditCardsAmount: number,
   cards: BalanceCreditCard[];
 }
 

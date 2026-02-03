@@ -6,5 +6,6 @@ import java.util.List;
 public record ResponseBalanceDTO(
         Integer referenceMonth,
         BigDecimal totalInvoicesAmount,
+        BigDecimal totalCreditCardsAmount,
         List<ResponseBalanceCreditCardDTO> cards
 ) {}

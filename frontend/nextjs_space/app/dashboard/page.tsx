@@ -64,7 +64,8 @@ export default function DashboardPage() {
 
   const totalCreditLimit = cards?.reduce?.((sum, card) => sum + (card?.creditLimit ?? 0), 0) ?? 0;
   const totalInvoicesAmount = balance?.totalInvoicesAmount ?? 0;
-  const availableCredit = totalCreditLimit - totalInvoicesAmount;
+  const totalAmount = balance?.totalCreditCardsAmount ?? 0;
+  const availableCredit = totalCreditLimit - totalAmount;
 
   // Chart data for balance
   const balanceChartData = balance?.cards?.map?.((card) => ({

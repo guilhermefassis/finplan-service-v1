@@ -17,17 +17,17 @@ public class BalanceMapper extends BaseMapper {
     }
 
 
-    public ResponseBalanceCreditCardDTO toResponseDTO(CreditCardBalanceProjection request, BigDecimal usageLimit) {
-        if (usageLimit.compareTo(BigDecimal.ZERO) < 0) {
-            usageLimit = usageLimit.multiply(BigDecimal.valueOf(-1));
+    public ResponseBalanceCreditCardDTO toResponseDTO(CreditCardBalanceProjection request, BigDecimal availableLimit) {
+        if (availableLimit.compareTo(BigDecimal.ZERO) < 0) {
+            availableLimit = availableLimit.multiply(BigDecimal.valueOf(-1));
         }
         return new ResponseBalanceCreditCardDTO(
                 request.getCardId(),
                 request.getCardName(),
                 request.getBrand(),
                 request.getCreditLimit(),
-                usageLimit,
-                request.getCreditLimit().subtract(usageLimit),
+                request.getCreditLimit().subtract(availableLimit),
+                availableLimit,
                 this.toInvoiceDTO(request)
         );
     }

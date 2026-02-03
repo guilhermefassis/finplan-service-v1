@@ -26,11 +26,15 @@ public class CreditCardBalanceService {
                 creditCardRepository.findMonthlyBalanceByUserAndMonth(userId, referenceMonth);
 
         BigDecimal totalMonthAmount = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
         List<ResponseBalanceCreditCardDTO> creditCards = new ArrayList<>();
 
         for(CreditCardBalanceProjection balance : results) {
-            BigDecimal usageLimit = limitService.calculateAvailableLimit(balance.getCardId(), balance.getCreditLimit());
-            creditCards.add(balanceMapper.toResponseDTO(balance, usageLimit));
+            BigDecimal availableLimit = limitService.calculateAvailableLimit(balance.getCardId(), balance.getCreditLimit());
+            creditCards.add(balanceMapper.toResponseDTO(balance, availableLimit));
+            BigDecimal usageLimit = balance.getCreditLimit().subtract(availableLimit);
+            totalAmount = totalAmount.add(usageLimit);
+
             if(balance.getTotalAmount() != null) {
                 totalMonthAmount = totalMonthAmount.add(balance.getTotalAmount());
             }
@@ -39,6 +43,7 @@ public class CreditCardBalanceService {
         return new ResponseBalanceDTO(
                 referenceMonth,
                 totalMonthAmount,
+                totalAmount,
                 creditCards
         );
     }
