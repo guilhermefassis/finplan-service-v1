@@ -14,6 +14,48 @@ type SupabaseTokenResponse = {
   };
 };
 
+async function refreshAccessToken(token: any) {
+  try {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Missing Supabase credentials');
+    }
+
+    const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseAnonKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        refresh_token: token.supabaseRefreshToken,
+      }),
+    });
+
+    const refreshedTokens = await response.json() as SupabaseTokenResponse;
+
+    if (!response.ok) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      supabaseAccessToken: refreshedTokens.access_token,
+      supabaseRefreshToken: refreshedTokens.refresh_token ?? token.supabaseRefreshToken,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+    };
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -58,6 +100,7 @@ export const authOptions: NextAuthOptions = {
           supabaseAccessToken: data.access_token,
           supabaseRefreshToken: data.refresh_token,
           supabaseExpiresIn: data.expires_in,
+          accessTokenExpires: Date.now() + data.expires_in * 1000,
         };
       },
     }),
@@ -75,14 +118,27 @@ export const authOptions: NextAuthOptions = {
         token.supabaseAccessToken = (user as any).supabaseAccessToken;
         token.supabaseRefreshToken = (user as any).supabaseRefreshToken;
         token.supabaseExpiresIn = (user as any).supabaseExpiresIn;
+        return token;
       }
-      return token;
+
+      if (Date.now() < (token.accessTokenExpires as number)) {
+        return token;
+      }
+
+      console.log('Token expired, refreshing...');
+      return refreshAccessToken(token);
+     
     },
     async session({ session, token }) {
       if (session?.user) {
         (session.user as any).id = token.id;
-        (session as any).supabaseAccessToken = token.supabaseAccessToken;
+        (session.user as any).email = token.email;
+        (session.user as any).name = token.name;
       }
+      
+      (session as any).supabaseAccessToken = token.supabaseAccessToken;
+      (session as any).error = token.error;
+      
       return session;
     },
   },

@@ -24,21 +24,27 @@ import { getSession } from 'next-auth/react';
 const DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'mock';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/finplan/api/v1';
 
-// Helper function to simulate API delay
+
 const delay = (ms: number = 0) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper function to get auth token (for future API integration)
+
 const getAuthToken = async (): Promise<string | null> => {
+  if (typeof window === 'undefined') return null;
   const session = await getSession();
-  return (session as any)?.supabaseAccessToken;
+  if ((session as any)?.error === 'RefreshAccessTokenError') {
+    window.location.href = '/login';
+    return null;
+  }
+  
+  return (session as any)?.supabaseAccessToken ?? null;
 };
 
-// Helper function to make API calls (for future use)
-const apiCall = async (endpoint: string, options: RequestInit = {}) => {
+const apiCall = async (endpoint: string, options: RequestInit = {}, retry = true) => {
   const token = await getAuthToken();
+  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {Authorization: "vazio"}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
@@ -47,14 +53,19 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     headers,
   });
 
+  if (response.status === 401 && retry) {
+    console.log('401 detected, forcing session refresh...');
+  
+    await getSession();
+    return apiCall(endpoint, options, false);
+  }
+
   if (!response.ok) {
     throw new Error(`API Error: ${response.status}`);
   }
 
   return response.json();
 };
-
-// ============== USER API ==============
 
 export const userApi = {
   async getMe(): Promise<User> {
@@ -64,18 +75,11 @@ export const userApi = {
 
   async updateUser(data: UserUpdateDTO): Promise<User> {
     await delay();
-    
-    if (DATA_MODE === 'api') {
+   
       return apiCall('/users', {
         method: 'PUT',
         body: JSON.stringify(data),
       });
-    }
-    
-    // Mock implementation
-    const updatedUser = { ...mockUsers[0], ...data, updatedAt: new Date().toISOString() };
-    Object.assign(mockUsers[0], updatedUser);
-    return updatedUser;
   },
 };
 
@@ -84,13 +88,7 @@ export const userApi = {
 export const creditCardApi = {
   async getAll(): Promise<CreditCard[]> {
     await delay();
-    
-    if (DATA_MODE === 'api') {
       return apiCall('/credit-cards');
-    }
-    
-    // Mock implementation
-    return mockCreditCards.filter(card => card.active);
   },
 
   async getById(id: string): Promise<CreditCard> {
