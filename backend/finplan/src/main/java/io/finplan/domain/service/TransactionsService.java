@@ -50,8 +50,13 @@ public class TransactionsService {
         if(limitService.hasAvailableLimit(creditCardId, creditCard.getCreditLimit(), request.amount())) {
             throw new InsufficientCreditLimitException("The amount exceeds credit card limit!!");
         }
-
-        for(int i = 0; i < request.totalInstallments(); i++) {
+        Integer totalInstallments;
+        if(!request.installments()) {
+            totalInstallments = 1;
+        } else {
+            totalInstallments = request.totalInstallments();
+        }
+        for(int i = 0; i < totalInstallments; i++) {
             CreditCardTransactions transaction = transactionMapper.toEntity(request, creditCard);
             Integer invoiceDate = calculusNextMonth(firstInvoiceDate,i);
             CreditCardInvoice invoice = invoiceService.findOrCreateInvoice(creditCard, invoiceDate);

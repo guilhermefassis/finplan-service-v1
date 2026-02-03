@@ -30,7 +30,7 @@ public class CreditLimitService {
 
     public boolean hasAvailableLimit(UUID creditCardId, BigDecimal creditLimit, BigDecimal transactionAmount) {
         BigDecimal availableLimit = calculateAvailableLimit(creditCardId, creditLimit);
-        return availableLimit.compareTo(transactionAmount) >= 0;
+        return availableLimit.compareTo(transactionAmount) <= 0;
     }
 
     public BigDecimal calculateUsedLimit(UUID creditCardId) {
