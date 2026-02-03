@@ -83,6 +83,8 @@ export const userApi = {
   },
 };
 
+
+
 // ============== CREDIT CARD API ==============
 
 export const creditCardApi = {
@@ -244,6 +246,15 @@ export const transactionApi = {
 // ============== INVOICE API ==============
 
 export const invoiceApi = {
+
+  getReferenceMonths: async (): Promise<number[]> => {
+    return apiCall('/invoices/reference-months');
+  },
+
+   getReferenceMonthsByCard: async (cardId: string): Promise<number[]> => {
+    return apiCall(`/credit-cards/${cardId}/invoices/reference-months`); 
+  },
+
   async getByCard(cardId: string, referenceDate?: number, includeTransactions: boolean = false): Promise<Invoice[]> {
     await delay();
     

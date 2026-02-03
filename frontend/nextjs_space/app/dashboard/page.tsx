@@ -1,45 +1,61 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
 import { Navbar } from '@/components/navbar';
 import { StatsCard } from '@/components/stats-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomPieChart } from '@/components/pie-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CreditCard, TrendingUp, DollarSign, Receipt, Loader2, Calendar } from 'lucide-react';
-import { balanceApi, creditCardApi } from '@/lib/services/api';
+
+import { CreditCard, TrendingUp, DollarSign, Loader2, Calendar } from 'lucide-react';
+
+import { balanceApi, creditCardApi, invoiceApi } from '@/lib/services/api';
 import { Balance, CreditCard as CreditCardType, STATUS_LABELS, InvoiceStatus } from '@/lib/types';
+
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
-  
-  // Estados
+
   const [balance, setBalance] = useState<Balance | null>(null);
   const [cards, setCards] = useState<CreditCardType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Estado do Mês Selecionado (Default: Mês Atual no formato YYYYMM)
-  const [selectedMonth, setSelectedMonth] = useState<string>(
+
+  // meses disponíveis vindos da API (ex: [202602, 202601...])
+  const [availableMonths, setAvailableMonths] = useState<number[]>([]);
+  const [isMonthsLoading, setIsMonthsLoading] = useState(true);
+
+  // mês selecionado (YYYYMM como string)
+  const [selectedMonth, setSelectedMonth] = useState<string>(() =>
     new Date().toISOString().slice(0, 7).replace('-', '')
   );
 
-  // Gerador de opções de meses (6 meses atrás até 6 meses à frente)
-  const monthOptions = useCallback(() => {
-    const options = [];
-    const currentDate = new Date();
-    for (let i = -6; i <= 6; i++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-      const value = date.toISOString().slice(0, 7).replace('-', '');
-      const label = format(date, 'MMMM yyyy', { locale: ptBR });
-      options.push({ value, label });
-    }
-    return options;
+  const currentMonthInt = useMemo(() => {
+    return parseInt(new Date().toISOString().slice(0, 7).replace('-', ''));
   }, []);
+
+  const monthOptions = useCallback(() => {
+    return (availableMonths ?? []).map((yyyymm) => {
+      const year = Math.floor(yyyymm / 100);
+      const monthIndex = (yyyymm % 100) - 1; // Date: 0..11
+      const date = new Date(year, monthIndex, 1);
+
+      return {
+        value: String(yyyymm),
+        label: format(date, 'MMMM yyyy', { locale: ptBR }),
+      };
+    });
+  }, [availableMonths]);
+
+  const selectedMonthLabel = useMemo(() => {
+    const opt = monthOptions().find((m) => m.value === selectedMonth);
+    return opt?.label ?? '';
+  }, [monthOptions, selectedMonth]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -47,17 +63,48 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  // Função de busca de dados
+  // 1) carrega meses disponíveis da API e define default do select
+  useEffect(() => {
+    const fetchMonths = async () => {
+      try {
+        setIsMonthsLoading(true);
+
+        const months = await invoiceApi.getReferenceMonths();
+        const normalized = (months ?? []).filter((m) => typeof m === 'number');
+        setAvailableMonths(normalized);
+
+        // Default:
+        // - se mês atual existir -> seleciona ele
+        // - senão -> seleciona o mais recente (posição 0, pois vem desc)
+        if (normalized.includes(currentMonthInt)) {
+          setSelectedMonth(String(currentMonthInt));
+        } else if (normalized.length > 0) {
+          setSelectedMonth(String(normalized[0]));
+        } // senão mantém o selectedMonth atual (fallback)
+      } catch (error) {
+        console.error('Error fetching available months:', error);
+      } finally {
+        setIsMonthsLoading(false);
+      }
+    };
+
+    if (status === 'authenticated') {
+      fetchMonths();
+    }
+  }, [status, currentMonthInt]);
+
+  // 2) busca dados do dashboard para o mês selecionado
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
+
       const monthInt = parseInt(selectedMonth);
-      
+
       const [balanceData, cardsData] = await Promise.all([
         balanceApi.getMonthlyBalance(monthInt),
         creditCardApi.getAll(),
       ]);
-      
+
       setBalance(balanceData);
       setCards(cardsData);
     } catch (error) {
@@ -68,12 +115,24 @@ export default function DashboardPage() {
   }, [selectedMonth]);
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status !== 'authenticated') return;
+
+    // Se você quiser impedir request quando não há meses disponíveis:
+    // - Se o backend só retorna meses com fatura, e não tem nenhum mês ainda,
+    //   você pode simplesmente não buscar.
+    if ((availableMonths?.length ?? 0) === 0) {
+      setBalance(null);
+      setCards([]);
+      setIsLoading(false);
+      return;
+    }
+
+    if (selectedMonth) {
       fetchData();
     }
-  }, [status, fetchData]);
+  }, [status, availableMonths, selectedMonth, fetchData]);
 
-  if (status === 'loading' || isLoading) {
+  if (status === 'loading' || isMonthsLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -83,36 +142,46 @@ export default function DashboardPage() {
 
   if (!session) return null;
 
-  // Cálculos
-  const totalCreditLimit = cards?.reduce?.((sum, card) => sum + (card?.creditLimit ?? 0), 0) ?? 0;
+  const totalCreditLimit =
+    cards?.reduce?.((sum, card) => sum + (card?.creditLimit ?? 0), 0) ?? 0;
+
   const totalInvoicesAmount = balance?.totalInvoicesAmount ?? 0;
   const totalAmount = balance?.totalCreditCardsAmount ?? 0;
   const availableCredit = totalCreditLimit - totalAmount;
 
-  const balanceChartData = balance?.cards?.map?.((card) => ({
-    name: card?.name ?? 'Cartão',
-    value: card?.invoice?.totalAmount ?? 0,
-  })).filter(item => item.value > 0) ?? [];
+  const balanceChartData =
+    balance?.cards
+      ?.map?.((card) => ({
+        name: card?.name ?? 'Cartão',
+        value: card?.invoice?.totalAmount ?? 0,
+      }))
+      ?.filter((item) => item.value > 0) ?? [];
 
-  // Função para obter a cor do status
-  const getStatusColor = (status: InvoiceStatus) => {
+  const getStatusColor = (invoiceStatus: InvoiceStatus) => {
     const colors: Record<InvoiceStatus, string> = {
-      [InvoiceStatus.OPEN]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      [InvoiceStatus.CLOSED]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      [InvoiceStatus.PAID]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      [InvoiceStatus.OVERDUE]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      [InvoiceStatus.OPEN]:
+        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      [InvoiceStatus.CLOSED]:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      [InvoiceStatus.PAID]:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      [InvoiceStatus.OVERDUE]:
+        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     };
-    return colors[status];
+    return colors[invoiceStatus];
   };
 
-  // Pega o status mais relevante das faturas (prioriza OVERDUE > CLOSED > OPEN > PAID)
+  // prioriza OVERDUE > CLOSED > OPEN > PAID
   const getMainInvoiceStatus = (): InvoiceStatus | null => {
-    const invoices = balance?.cards?.map(c => c.invoice).filter(Boolean) ?? [];
+    const invoices = balance?.cards?.map((c) => c.invoice).filter(Boolean) ?? [];
     if (invoices.length === 0) return null;
 
-    if (invoices.some(inv => inv?.status === InvoiceStatus.OVERDUE)) return InvoiceStatus.OVERDUE;
-    if (invoices.some(inv => inv?.status === InvoiceStatus.CLOSED)) return InvoiceStatus.CLOSED;
-    if (invoices.some(inv => inv?.status === InvoiceStatus.OPEN)) return InvoiceStatus.OPEN;
+    if (invoices.some((inv) => inv?.status === InvoiceStatus.OVERDUE))
+      return InvoiceStatus.OVERDUE;
+    if (invoices.some((inv) => inv?.status === InvoiceStatus.CLOSED))
+      return InvoiceStatus.CLOSED;
+    if (invoices.some((inv) => inv?.status === InvoiceStatus.OPEN))
+      return InvoiceStatus.OPEN;
     return InvoiceStatus.PAID;
   };
 
@@ -121,29 +190,33 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* Header com Seletor */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              Visão geral das suas finanças
-            </p>
+            <p className="text-muted-foreground mt-1">Visão geral das suas finanças</p>
           </div>
 
           <div className="flex items-center gap-2 min-w-[200px]">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger className="w-full md:w-[220px]">
                 <SelectValue placeholder="Selecione o mês" />
               </SelectTrigger>
               <SelectContent>
-                {monthOptions().map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label.charAt(0).toUpperCase() + option.label.slice(1)}
-                  </SelectItem>
-                ))}
+                {monthOptions().length > 0 ? (
+                  monthOptions().map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label.charAt(0).toUpperCase() + option.label.slice(1)}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    Nenhuma fatura encontrada
+                  </div>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -156,33 +229,48 @@ export default function DashboardPage() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fatura do mês</CardTitle>
               {mainStatus && (
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(mainStatus)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(
+                    mainStatus
+                  )}`}
+                >
                   {STATUS_LABELS[mainStatus]}
                 </span>
               )}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvoicesAmount)}
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                }).format(totalInvoicesAmount)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Referente a {monthOptions().find(m => m.value === selectedMonth)?.label}
+                {selectedMonthLabel ? `Referente a ${selectedMonthLabel}` : 'Referente ao mês selecionado'}
               </p>
             </CardContent>
           </Card>
 
           <StatsCard
             title="Gasto Total em Aberto"
-            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalAmount)}
+            value={new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(totalAmount)}
             icon={CreditCard}
             description="Soma de todos os gastos com cartões"
           />
+
           <StatsCard
             title="Crédito Disponível"
-            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(availableCredit)}
+            value={new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(availableCredit)}
             icon={DollarSign}
             description="Limite - Faturas do mês"
           />
+
           <StatsCard
             title="Cartões Ativos"
             value={cards?.length?.toString() ?? '0'}
@@ -215,10 +303,12 @@ export default function DashboardPage() {
               <CardDescription>Percentual de uso do limite total</CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-               <CustomPieChart data={[
-                 { name: 'Usado', value: totalAmount },
-                 { name: 'Disponível', value: availableCredit > 0 ? availableCredit : 0 }
-               ]} />
+              <CustomPieChart
+                data={[
+                  { name: 'Usado', value: totalAmount },
+                  { name: 'Disponível', value: availableCredit > 0 ? availableCredit : 0 },
+                ]}
+              />
             </CardContent>
           </Card>
         </div>
@@ -227,13 +317,16 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Status dos Cartões</CardTitle>
-            <CardDescription>Detalhamento por cartão em {monthOptions().find(m => m.value === selectedMonth)?.label}</CardDescription>
+            <CardDescription>
+              Detalhamento por cartão{selectedMonthLabel ? ` em ${selectedMonthLabel}` : ''}
+            </CardDescription>
           </CardHeader>
+
           <CardContent>
             <div className="space-y-4">
               {cards?.length > 0 ? (
                 cards.map((card) => {
-                  const cardBalance = balance?.cards?.find(bc => bc.id === card.id);
+                  const cardBalance = balance?.cards?.find((bc) => bc.id === card.id);
                   const spent = cardBalance?.usageLimit ?? 0;
                   const percent = card.creditLimit > 0 ? (spent / card.creditLimit) * 100 : 0;
 
@@ -246,20 +339,31 @@ export default function DashboardPage() {
                           </div>
                           <span className="font-medium">{card.name}</span>
                         </div>
+
                         <span className="font-bold">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(spent)}
+                          {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(spent)}
                         </span>
                       </div>
-                      {/* Barra de progresso simples */}
+
                       <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full transition-all ${percent > 90 ? 'bg-destructive' : 'bg-primary'}`}
                           style={{ width: `${Math.min(percent, 100)}%` }}
                         />
                       </div>
+
                       <div className="flex justify-between mt-1 text-[10px] text-muted-foreground uppercase font-bold">
                         <span>{percent.toFixed(1)}% utilizado</span>
-                        <span>Limite: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(card.creditLimit)}</span>
+                        <span>
+                          Limite:{' '}
+                          {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(card.creditLimit)}
+                        </span>
                       </div>
                     </div>
                   );
