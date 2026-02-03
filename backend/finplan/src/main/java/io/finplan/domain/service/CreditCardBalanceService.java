@@ -19,6 +19,7 @@ public class CreditCardBalanceService {
 
     private final CreditCardRepository creditCardRepository;
     private final BalanceMapper balanceMapper;
+    private final CreditLimitService limitService;
 
     public ResponseBalanceDTO getMonthlyBalance(UUID userId, Integer referenceMonth) {
         List<CreditCardBalanceProjection> results =
@@ -28,7 +29,8 @@ public class CreditCardBalanceService {
         List<ResponseBalanceCreditCardDTO> creditCards = new ArrayList<>();
 
         for(CreditCardBalanceProjection balance : results) {
-            creditCards.add(balanceMapper.toResponseDTO(balance));
+            BigDecimal usageLimit = limitService.calculateAvailableLimit(balance.getCardId(), balance.getCreditLimit());
+            creditCards.add(balanceMapper.toResponseDTO(balance, usageLimit));
             if(balance.getTotalAmount() != null) {
                 totalMonthAmount = totalMonthAmount.add(balance.getTotalAmount());
             }

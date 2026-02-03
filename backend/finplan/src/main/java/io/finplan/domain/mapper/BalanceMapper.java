@@ -7,6 +7,8 @@ import io.finplan.domain.model.enums.StatusType;
 import io.finplan.domain.repository.projection.CreditCardBalanceProjection;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class BalanceMapper extends BaseMapper {
 
@@ -15,12 +17,17 @@ public class BalanceMapper extends BaseMapper {
     }
 
 
-    public ResponseBalanceCreditCardDTO toResponseDTO(CreditCardBalanceProjection request) {
+    public ResponseBalanceCreditCardDTO toResponseDTO(CreditCardBalanceProjection request, BigDecimal usageLimit) {
+        if (usageLimit.compareTo(BigDecimal.ZERO) < 0) {
+            usageLimit = usageLimit.multiply(BigDecimal.valueOf(-1));
+        }
         return new ResponseBalanceCreditCardDTO(
                 request.getCardId(),
                 request.getCardName(),
                 request.getBrand(),
                 request.getCreditLimit(),
+                usageLimit,
+                request.getCreditLimit().subtract(usageLimit),
                 this.toInvoiceDTO(request)
         );
     }

@@ -8,6 +8,8 @@ public record ResponseBalanceCreditCardDTO(
         String name,
         String brand,
         BigDecimal creditLimit,
+        BigDecimal usageLimit,
+        BigDecimal availableLimit,
         ResponseBalanceInvoiceDTO invoice
 ) {
 }

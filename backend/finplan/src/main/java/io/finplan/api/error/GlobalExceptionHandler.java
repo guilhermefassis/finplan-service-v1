@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InsufficientCreditLimitException.class)
-    public ProblemDetail handleBInsufficientCreditLimit(BusinessRuleException ex) {
+    public ProblemDetail handleBInsufficientCreditLimit(InsufficientCreditLimitException ex) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         pd.setTitle("Business rule violation");
         pd.setDetail(ex.getMessage());
