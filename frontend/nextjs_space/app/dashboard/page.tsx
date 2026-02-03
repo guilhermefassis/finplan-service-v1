@@ -10,7 +10,7 @@ import { CustomPieChart } from '@/components/pie-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard, TrendingUp, DollarSign, Receipt, Loader2, Calendar } from 'lucide-react';
 import { balanceApi, creditCardApi } from '@/lib/services/api';
-import { Balance, CreditCard as CreditCardType } from '@/lib/types';
+import { Balance, CreditCard as CreditCardType, STATUS_LABELS, InvoiceStatus } from '@/lib/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -94,6 +94,30 @@ export default function DashboardPage() {
     value: card?.invoice?.totalAmount ?? 0,
   })).filter(item => item.value > 0) ?? [];
 
+  // Função para obter a cor do status
+  const getStatusColor = (status: InvoiceStatus) => {
+    const colors: Record<InvoiceStatus, string> = {
+      [InvoiceStatus.OPEN]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      [InvoiceStatus.CLOSED]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      [InvoiceStatus.PAID]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      [InvoiceStatus.OVERDUE]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    };
+    return colors[status];
+  };
+
+  // Pega o status mais relevante das faturas (prioriza OVERDUE > CLOSED > OPEN > PAID)
+  const getMainInvoiceStatus = (): InvoiceStatus | null => {
+    const invoices = balance?.cards?.map(c => c.invoice).filter(Boolean) ?? [];
+    if (invoices.length === 0) return null;
+
+    if (invoices.some(inv => inv?.status === InvoiceStatus.OVERDUE)) return InvoiceStatus.OVERDUE;
+    if (invoices.some(inv => inv?.status === InvoiceStatus.CLOSED)) return InvoiceStatus.CLOSED;
+    if (invoices.some(inv => inv?.status === InvoiceStatus.OPEN)) return InvoiceStatus.OPEN;
+    return InvoiceStatus.PAID;
+  };
+
+  const mainStatus = getMainInvoiceStatus();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -127,17 +151,31 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          {/* Card customizado com status */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Fatura do mês</CardTitle>
+              {mainStatus && (
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(mainStatus)}`}>
+                  {STATUS_LABELS[mainStatus]}
+                </span>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvoicesAmount)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Referente a {monthOptions().find(m => m.value === selectedMonth)?.label}
+              </p>
+            </CardContent>
+          </Card>
+
           <StatsCard
-            title="Total em Faturas"
-            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvoicesAmount)}
-            icon={Receipt}
-            description={`Referente a ${monthOptions().find(m => m.value === selectedMonth)?.label}`}
-          />
-          <StatsCard
-            title="Limite Total"
-            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalCreditLimit)}
+            title="Gasto Total em Aberto"
+            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalAmount)}
             icon={CreditCard}
-            description="Soma de todos os cartões"
+            description="Soma de todos os gastos com cartões"
           />
           <StatsCard
             title="Crédito Disponível"
@@ -177,7 +215,6 @@ export default function DashboardPage() {
               <CardDescription>Percentual de uso do limite total</CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-               {/* Aqui você pode manter o PieChart ou criar um gráfico de barras de uso */}
                <CustomPieChart data={[
                  { name: 'Usado', value: totalAmount },
                  { name: 'Disponível', value: availableCredit > 0 ? availableCredit : 0 }
@@ -197,7 +234,7 @@ export default function DashboardPage() {
               {cards?.length > 0 ? (
                 cards.map((card) => {
                   const cardBalance = balance?.cards?.find(bc => bc.id === card.id);
-                  const spent = cardBalance?.invoice?.totalAmount ?? 0;
+                  const spent = cardBalance?.usageLimit ?? 0;
                   const percent = card.creditLimit > 0 ? (spent / card.creditLimit) * 100 : 0;
 
                   return (
