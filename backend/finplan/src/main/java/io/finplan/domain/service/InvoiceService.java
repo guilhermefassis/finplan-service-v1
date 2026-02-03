@@ -27,7 +27,6 @@ public class InvoiceService {
     private final CreditCardInvoiceRepository invoiceRepository;
     private final InvoiceMapper invoiceMapper;
 
-    //TODO Create a method to close invoice when the closing date arrives
     public CreditCardInvoice findOrCreateInvoice(CreditCard creditCard, Integer referenceMonth){
         return invoiceRepository
                 .findByCreditCardIdAndReferenceMonth(creditCard.getId(), referenceMonth).orElseGet(() -> {
@@ -163,6 +162,14 @@ public class InvoiceService {
 
         CreditCardInvoice savedInvoice = invoiceRepository.saveAndFlush(invoice);
         return invoiceMapper.toResponse(savedInvoice, false);
+    }
+
+    public List<Integer> getAvailableReferenceMonths(UUID userId) {
+        return invoiceRepository.findDistinctReferenceMonthsByUserId(userId);
+    }
+
+    public List<Integer> getAvailableReferenceMonthsByCard(UUID userId, UUID cardId) {
+        return invoiceRepository.findDistinctReferenceMonthsByUserIdAndCardId(userId, cardId);
     }
 
     private boolean isBusinessDay(LocalDate date) {

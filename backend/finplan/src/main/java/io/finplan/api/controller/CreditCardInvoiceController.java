@@ -4,6 +4,8 @@ import io.finplan.api.dto.invoice.ResponseInvoiceDTO;
 import io.finplan.api.dto.invoice.UpdateInvoiceDTO;
 import io.finplan.domain.service.InvoiceService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,4 +59,12 @@ public class CreditCardInvoiceController {
         return invoiceService.payInvoice(invoiceId, cardId, request);
     }
 
+    @GetMapping("/reference-months")
+    public List<Integer> getReferenceMonthsByCard(
+            @PathVariable UUID cardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        return invoiceService.getAvailableReferenceMonthsByCard(userId, cardId);
+    }
 }
