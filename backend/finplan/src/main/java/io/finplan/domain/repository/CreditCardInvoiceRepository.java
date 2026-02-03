@@ -1,6 +1,7 @@
 package io.finplan.domain.repository;
 
 import io.finplan.domain.entity.CreditCardInvoice;
+import io.finplan.domain.model.enums.StatusType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,8 @@ public interface CreditCardInvoiceRepository extends JpaRepository<CreditCardInv
 
     Optional<CreditCardInvoice> findByCreditCardIdAndReferenceMonth(UUID creditCardId,
                                                                     Integer referenceMonth);
+
+    List<CreditCardInvoice> findByCreditCardIdAndStatusIn(UUID creditCardId, List<StatusType> statuses);
 
     Optional<CreditCardInvoice> findByIdAndCreditCardId(UUID id, UUID creditCardId);
 

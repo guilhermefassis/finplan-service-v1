@@ -5,6 +5,8 @@ import io.finplan.common.utils.DateReferenceUtils;
 import io.finplan.domain.entity.CreditCard;
 import io.finplan.domain.entity.CreditCardInvoice;
 import io.finplan.domain.entity.CreditCardTransactions;
+import io.finplan.domain.exception.BusinessRuleException;
+import io.finplan.domain.exception.InsufficientCreditLimitException;
 import io.finplan.domain.exception.ResourceNotFoundException;
 import io.finplan.domain.mapper.CreditCardTransactionMapper;
 import io.finplan.domain.repository.CreditCardTransactionRepository;
@@ -25,6 +27,7 @@ public class TransactionsService {
 
     private final CreditCardTransactionRepository transactionRepository;
     private final CreditCardService creditCardService;
+    private final CreditLimitService limitService;
     private final CreditCardTransactionMapper transactionMapper;
     private final InvoiceService invoiceService;
 
@@ -39,6 +42,14 @@ public class TransactionsService {
         CreditCardTransactions transactionToReturn = null;
         CreditCardTransactions lastSaved = null;
         UUID groupId = UUID.randomUUID();
+
+        if (!creditCard.isActive()) {
+            throw new BusinessRuleException("Credit Card is deactivated!");
+        }
+
+        if(limitService.hasAvailableLimit(creditCardId, creditCard.getCreditLimit(), request.amount())) {
+            throw new InsufficientCreditLimitException("The amount exceeds credit card limit!!");
+        }
 
         for(int i = 0; i < request.totalInstallments(); i++) {
             CreditCardTransactions transaction = transactionMapper.toEntity(request, creditCard);

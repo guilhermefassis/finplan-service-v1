@@ -1,6 +1,7 @@
 package io.finplan.api.error;
 
 import io.finplan.domain.exception.BusinessRuleException;
+import io.finplan.domain.exception.InsufficientCreditLimitException;
 import io.finplan.domain.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessRuleException.class)
     public ProblemDetail handleBusiness(BusinessRuleException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+        pd.setTitle("Business rule violation");
+        pd.setDetail(ex.getMessage());
+        pd.setType(URI.create("https://finplan/errors/business-rule"));
+        return pd;
+    }
+
+    @ExceptionHandler(InsufficientCreditLimitException.class)
+    public ProblemDetail handleBInsufficientCreditLimit(BusinessRuleException ex) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         pd.setTitle("Business rule violation");
         pd.setDetail(ex.getMessage());

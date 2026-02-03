@@ -9,6 +9,7 @@ import io.finplan.domain.entity.CreditCardTransactions;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Component
@@ -24,18 +25,24 @@ public class CreditCardTransactionMapper extends BaseMapper {
         transaction.setPurchaseDate(request.purchaseDate());
         transaction.setDescription(request.description());
         transaction.setCategory(request.category());
-        transaction.setAmount(request.amount());
+        transaction.setTotalPurchaseAmount(request.amount());
         transaction.setInstallments(request.installments());
-        transaction.setTotalInstallments(request.totalInstallments());
-        transaction.setCurrentInstallment(request.currentInstallment());
-        transaction.setTotalPurchaseAmount(sumTotalPurchaseAmount(request));
+        if(!request.installments()) {
+            transaction.setTotalInstallments(1);
+            transaction.setCurrentInstallment(1);
+            transaction.setAmount(request.amount());
+        } else {
+            transaction.setTotalInstallments(request.totalInstallments());
+            transaction.setCurrentInstallment(request.currentInstallment());
+            transaction.setAmount(getInstallmentAmount(request));
+        }
 
         return transaction;
     }
 
-    private BigDecimal sumTotalPurchaseAmount(RequestCreditCardTransactionDTO request) {
+    private BigDecimal getInstallmentAmount(RequestCreditCardTransactionDTO request) {
         int totalInstallments = request.totalInstallments();
-        return request.amount().multiply(BigDecimal.valueOf(totalInstallments));
+        return request.amount().divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.HALF_DOWN);
     }
 
     public ResponseCreditCardTransactionDTO toResponseDTO(CreditCardTransactions request) {
