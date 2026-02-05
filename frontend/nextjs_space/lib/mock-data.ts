@@ -238,12 +238,15 @@ export const mockInvoices: Invoice[] = [
 export const mockBalance: Balance = {
   referenceMonth: 202412,
   totalInvoicesAmount: 1695.01,
+  totalCreditCardsAmount: 5000,
   cards: [
     {
       id: '660e8400-e29b-41d4-a716-446655440000',
       name: 'Cartão Principal',
       brand: 'Visa',
       creditLimit: 5000,
+      usageLimit: 3000, 
+      availableLimit: 2000,
       invoice: {
         id: '880e8400-e29b-41d4-a716-446655440000',
         referenceMonth: 202412,
@@ -258,6 +261,8 @@ export const mockBalance: Balance = {
       name: 'Cartão Adicional',
       brand: 'Mastercard',
       creditLimit: 3000,
+      usageLimit: 3000,      
+      availableLimit: 2000,
       invoice: {
         id: '880e8400-e29b-41d4-a716-446655440001',
         referenceMonth: 202412,
