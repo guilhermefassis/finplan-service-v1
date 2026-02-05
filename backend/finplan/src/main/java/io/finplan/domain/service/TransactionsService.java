@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.finplan.api.dto.transactions.*;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Objects;
@@ -99,8 +100,10 @@ public class TransactionsService {
     }
 
     public List<ResponseCreditCardTransactionDTO> getTransactionByCreditCard(UUID creditCardId, UUID userId) {
+        YearMonth yerMonth = YearMonth.now();
+        Integer referenceMonth = DateReferenceUtils.toReference(yerMonth);
         CreditCard creditCard = creditCardService.validateAndReturnCreditCardId(creditCardId, userId);
-        List<CreditCardTransactions> transactions = transactionRepository.findByCreditCardId(creditCard.getId());
+        List<CreditCardTransactions> transactions = transactionRepository.findByCreditCardAndReferenceMonth(creditCard.getId(), referenceMonth);
         return transactionMapper.toListResponseDTO(transactions);
     }
 
@@ -108,7 +111,7 @@ public class TransactionsService {
         YearMonth baseDate = DateReferenceUtils.fromReference(referenceDate);
         YearMonth transactionDate = baseDate.plusMonths(monthsToSum);
 
-        return (transactionDate.getYear() * 100) + transactionDate.getMonthValue();
+        return DateReferenceUtils.toReference(transactionDate);
     }
 
     private Integer getDateOfFirstInvoice(LocalDate purchaseDate, Integer closingDay) {

@@ -16,6 +16,19 @@ import java.util.UUID;
 public interface CreditCardTransactionRepository extends JpaRepository<CreditCardTransactions, UUID> {
     List<CreditCardTransactions> findByGroupIdAndCreditCard_Id(UUID groupId, UUID cardId);
     List<CreditCardTransactions> findByCreditCardId(UUID creditCardId);
+    @Query("""
+        SELECT t
+        FROM CreditCardTransactions t
+        JOIN FETCH t.creditCard c
+        JOIN FETCH t.creditCardInvoice i
+        WHERE c.id = :creditCardId
+        AND i.referenceMonth = :referenceMonth
+        ORDER BY t.purchaseDate DESC
+    """)
+    List<CreditCardTransactions> findByCreditCardAndReferenceMonth(
+            @Param("creditCardId") UUID creditCardId,
+            @Param("referenceMonth") Integer referenceMonth
+    );
     @Modifying
     @Transactional
     void deleteByGroupId(UUID groupId);
