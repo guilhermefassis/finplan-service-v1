@@ -37,8 +37,8 @@ export async function POST(req: Request) {
     mockUsers.push(newUser);
 
     return NextResponse.json(
-      { message: 'User created successfully', user: { id: newUser.id, email: newUser.email, name: newUser.name } },
-      { status: 201 }
+      { message: 'Bloqued', user: { id: newUser.id, email: newUser.email, name: newUser.name } },
+      { status: 400 }
     );
   } catch (error) {
     console.error('Signup error:', error);
