@@ -23,7 +23,7 @@ import {
 import { getSession } from 'next-auth/react';
 
 // Configuration
-const DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'mock';
+const DATA_MODE = process.env.DATA_MODE || 'mock';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/finplan/api/v1';
 
 
