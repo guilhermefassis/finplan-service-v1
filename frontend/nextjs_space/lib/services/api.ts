@@ -9,7 +9,9 @@ import {
   Invoice,
   PayInvoiceDTO,
   Balance,
-  InvoiceStatus
+  InvoiceStatus,
+  ExpensesByCategory,
+  TransactionCategory
 } from '../types';
 import { 
   mockUsers, 
@@ -325,5 +327,49 @@ export const balanceApi = {
     
     // Mock implementation
     return mockBalance;
+  },
+};
+
+// Adicione ao final do arquivo api.ts
+
+// ============== ANALYTICS API ==============
+
+export const analyticsApi = {
+  async getExpensesByCategory(referenceMonth?: number): Promise<ExpensesByCategory> {
+    await delay();
+    
+    if (DATA_MODE === 'api') {
+      const params = referenceMonth ? `?referenceMonth=${referenceMonth}` : '';
+      return apiCall(`/balances/analytics/expenses/by-category${params}`);
+    }
+    
+    // Mock implementation
+    return {
+      referenceMonth: referenceMonth || 0,
+      currency: 'BRL',
+      totalAmount: 1850.00,
+      categories: [
+        {
+          category: 'TRAVEL' as TransactionCategory,
+          categoryName: 'TRAVEL',
+          monthlyAmount: 1500.00,
+          totalAccumulatedAmount: 1500.00,
+          percentageInMonth: 81.08,
+          transactionCount: 10,
+        },
+        {
+          category: 'FOOD_AND_DINING' as TransactionCategory,
+          categoryName: 'FOOD_AND_DINING',
+          monthlyAmount: 350.00,
+          totalAccumulatedAmount: 350.00,
+          percentageInMonth: 18.92,
+          transactionCount: 1,
+        },
+      ],
+    };
+  },
+
+  async getTotalExpensesByCategory(): Promise<ExpensesByCategory> {
+    return this.getExpensesByCategory();
   },
 };

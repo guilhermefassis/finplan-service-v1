@@ -10,10 +10,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CustomPieChart } from '@/components/pie-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { CreditCard, TrendingUp, DollarSign, Loader2, Calendar } from 'lucide-react';
+import { CreditCard, TrendingUp, DollarSign, Loader2, Calendar, PieChart } from 'lucide-react';
 
-import { balanceApi, creditCardApi, invoiceApi } from '@/lib/services/api';
-import { Balance, CreditCard as CreditCardType, STATUS_LABELS, InvoiceStatus } from '@/lib/types';
+import { balanceApi, creditCardApi, invoiceApi, analyticsApi } from '@/lib/services/api';
+import { 
+  Balance, 
+  CreditCard as CreditCardType, 
+  STATUS_LABELS, 
+  InvoiceStatus,
+  ExpensesByCategory,
+  CATEGORY_LABELS 
+} from '@/lib/types';
 
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -26,11 +33,13 @@ export default function DashboardPage() {
   const [cards, setCards] = useState<CreditCardType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // meses disponíveis vindos da API (ex: [202602, 202601...])
+  // Estados para analytics
+  const [monthlyExpenses, setMonthlyExpenses] = useState<ExpensesByCategory | null>(null);
+  const [totalExpenses, setTotalExpenses] = useState<ExpensesByCategory | null>(null);
+
   const [availableMonths, setAvailableMonths] = useState<number[]>([]);
   const [isMonthsLoading, setIsMonthsLoading] = useState(true);
 
-  // mês selecionado (YYYYMM como string)
   const [selectedMonth, setSelectedMonth] = useState<string>(() =>
     new Date().toISOString().slice(0, 7).replace('-', '')
   );
@@ -42,7 +51,7 @@ export default function DashboardPage() {
   const monthOptions = useCallback(() => {
     return (availableMonths ?? []).map((yyyymm) => {
       const year = Math.floor(yyyymm / 100);
-      const monthIndex = (yyyymm % 100) - 1; // Date: 0..11
+      const monthIndex = (yyyymm % 100) - 1;
       const date = new Date(year, monthIndex, 1);
 
       return {
@@ -63,7 +72,6 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  // 1) carrega meses disponíveis da API e define default do select
   useEffect(() => {
     const fetchMonths = async () => {
       try {
@@ -73,14 +81,11 @@ export default function DashboardPage() {
         const normalized = (months ?? []).filter((m) => typeof m === 'number');
         setAvailableMonths(normalized);
 
-        // Default:
-        // - se mês atual existir -> seleciona ele
-        // - senão -> seleciona o mais recente (posição 0, pois vem desc)
         if (normalized.includes(currentMonthInt)) {
           setSelectedMonth(String(currentMonthInt));
         } else if (normalized.length > 0) {
           setSelectedMonth(String(normalized[0]));
-        } // senão mantém o selectedMonth atual (fallback)
+        }
       } catch (error) {
         console.error('Error fetching available months:', error);
       } finally {
@@ -93,20 +98,23 @@ export default function DashboardPage() {
     }
   }, [status, currentMonthInt]);
 
-  // 2) busca dados do dashboard para o mês selecionado
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
 
       const monthInt = parseInt(selectedMonth);
 
-      const [balanceData, cardsData] = await Promise.all([
+      const [balanceData, cardsData, monthlyExpensesData, totalExpensesData] = await Promise.all([
         balanceApi.getMonthlyBalance(monthInt),
         creditCardApi.getAll(),
+        analyticsApi.getExpensesByCategory(monthInt),
+        analyticsApi.getTotalExpensesByCategory(),
       ]);
 
       setBalance(balanceData);
       setCards(cardsData);
+      setMonthlyExpenses(monthlyExpensesData);
+      setTotalExpenses(totalExpensesData);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -117,12 +125,11 @@ export default function DashboardPage() {
   useEffect(() => {
     if (status !== 'authenticated') return;
 
-    // Se você quiser impedir request quando não há meses disponíveis:
-    // - Se o backend só retorna meses com fatura, e não tem nenhum mês ainda,
-    //   você pode simplesmente não buscar.
     if ((availableMonths?.length ?? 0) === 0) {
       setBalance(null);
       setCards([]);
+      setMonthlyExpenses(null);
+      setTotalExpenses(null);
       setIsLoading(false);
       return;
     }
@@ -157,6 +164,24 @@ export default function DashboardPage() {
       }))
       ?.filter((item) => item.value > 0) ?? [];
 
+  // Dados para gráfico de gastos mensais por categoria
+  const monthlyExpensesChartData =
+    monthlyExpenses?.categories
+      ?.map((cat) => ({
+        name: CATEGORY_LABELS[cat.category] || cat.categoryName,
+        value: cat.monthlyAmount,
+      }))
+      ?.filter((item) => item.value > 0) ?? [];
+
+  // Dados para gráfico de gastos totais por categoria
+  const totalExpensesChartData =
+    totalExpenses?.categories
+      ?.map((cat) => ({
+        name: CATEGORY_LABELS[cat.category] || cat.categoryName,
+        value: cat.totalAccumulatedAmount,
+      }))
+      ?.filter((item) => item.value > 0) ?? [];
+
   const getStatusColor = (invoiceStatus: InvoiceStatus) => {
     const colors: Record<InvoiceStatus, string> = {
       [InvoiceStatus.OPEN]:
@@ -171,7 +196,6 @@ export default function DashboardPage() {
     return colors[invoiceStatus];
   };
 
-  // prioriza OVERDUE > CLOSED > OPEN > PAID
   const getMainInvoiceStatus = (): InvoiceStatus | null => {
     const invoices = balance?.cards?.map((c) => c.invoice).filter(Boolean) ?? [];
     if (invoices.length === 0) return null;
@@ -224,7 +248,6 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          {/* Card customizado com status */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fatura do mês</CardTitle>
@@ -279,7 +302,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Charts */}
+        {/* Charts - Primeira Linha */}
         <div className="grid gap-6 md:grid-cols-2 mb-8">
           <Card>
             <CardHeader>
@@ -309,6 +332,52 @@ export default function DashboardPage() {
                   { name: 'Disponível', value: availableCredit > 0 ? availableCredit : 0 },
                 ]}
               />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts - Segunda Linha (Gastos por Categoria) */}
+        <div className="grid gap-6 md:grid-cols-2 mb-8">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                <CardTitle>Gastos por Categoria - Mensal</CardTitle>
+              </div>
+              <CardDescription>
+                Distribuição de gastos por categoria{' '}
+                {selectedMonthLabel ? `em ${selectedMonthLabel}` : 'no mês selecionado'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {monthlyExpensesChartData.length > 0 ? (
+                <CustomPieChart data={monthlyExpensesChartData} />
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
+                  Nenhum gasto por categoria neste mês
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                <CardTitle>Gastos por Categoria - Total</CardTitle>
+              </div>
+              <CardDescription>
+                Distribuição total acumulada de gastos por categoria
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {totalExpensesChartData.length > 0 ? (
+                <CustomPieChart data={totalExpensesChartData} />
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
+                  Nenhum gasto por categoria registrado
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

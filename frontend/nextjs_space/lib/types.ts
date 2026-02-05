@@ -195,3 +195,20 @@ export const STATUS_LABELS: Record<InvoiceStatus, string> = {
   [InvoiceStatus.PAID]: 'Paga',
   [InvoiceStatus.OVERDUE]: 'Vencida',
 };
+
+
+export interface CategoryExpenseDetail {
+  category: TransactionCategory;
+  categoryName: string;
+  monthlyAmount: number;
+  totalAccumulatedAmount: number;
+  percentageInMonth: number;
+  transactionCount: number;
+}
+
+export interface ExpensesByCategory {
+  referenceMonth: number;
+  currency: string;
+  totalAmount: number;
+  categories: CategoryExpenseDetail[];
+}
