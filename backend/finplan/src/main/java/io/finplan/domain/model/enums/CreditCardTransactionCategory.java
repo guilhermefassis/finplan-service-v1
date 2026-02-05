@@ -1,0 +1,25 @@
+package io.finplan.domain.model.enums;
+
+public enum CreditCardTransactionCategory {
+    FOOD_AND_DINING,
+    GROCERIES,
+    TRANSPORTATION,
+    FUEL,
+    HOUSING,
+    UTILITIES,
+    HEALTH_AND_FITNESS,
+    EDUCATION,
+    ENTERTAINMENT,
+    SHOPPING,
+    CLOTHING,
+    ELECTRONICS,
+    TRAVEL,
+    SUBSCRIPTIONS,
+    STREAMING_SERVICES,
+    PERSONAL_CARE,
+    PETS,
+    GIFTS_AND_DONATIONS,
+    INVESTMENTS,
+    TAXES,
+    OTHERS
+}
