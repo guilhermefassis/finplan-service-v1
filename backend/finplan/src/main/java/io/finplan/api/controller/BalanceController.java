@@ -1,5 +1,6 @@
 package io.finplan.api.controller;
 
+import io.finplan.api.dto.balance.ExpensesByCategoryResponse;
 import io.finplan.api.dto.balance.ResponseBalanceDTO;
 import io.finplan.domain.service.CreditCardBalanceService;
 import lombok.AllArgsConstructor;
@@ -27,5 +28,15 @@ public class BalanceController {
 
         return cardBalanceService.getMonthlyBalance(userId, referenceDate);
     }
+
+    @GetMapping("/analytics/expenses/by-category")
+    public ExpensesByCategoryResponse getExpensesByCategory(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam Integer referenceMonth
+    ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        return cardBalanceService.getExpensesByCategory(userId, referenceMonth);
+    }
+
 
 }
