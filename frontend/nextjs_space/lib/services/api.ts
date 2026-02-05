@@ -41,7 +41,7 @@ const getAuthToken = async (): Promise<string | null> => {
   return (session as any)?.supabaseAccessToken ?? null;
 };
 
-const apiCall = async (endpoint: string, options: RequestInit = {}, retry = true) => {
+const apiCall = async (endpoint: string, options: RequestInit = {}, retry = true): Promise<any> => {
   const token = await getAuthToken();
   
   const headers: HeadersInit = {
