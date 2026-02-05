@@ -113,6 +113,56 @@ public class CreditCardBalanceService {
         );
     }
 
+    public ExpensesByCategoryResponse getTotalExpensesByCategory(UUID userId) {
+
+        List<CategoryExpenseProjection> monthlyExpenses =
+                transactionRepository.findTotalExpensesByCategory(userId);
+
+        List<CategoryTotalProjection> totalExpenses =
+                transactionRepository.findTotalAccumulatedExpensesByCategory(userId);
+
+        Map<String, BigDecimal> accumulatedMap = totalExpenses.stream()
+                .collect(Collectors.toMap(
+                        CategoryTotalProjection::getCategory,
+                        CategoryTotalProjection::getTotalAmount
+                ));
+
+        BigDecimal totalMonthlyAmount = monthlyExpenses.stream()
+                .map(CategoryExpenseProjection::getMonthlyAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<CategoryExpenseDetailDTO> categories = monthlyExpenses.stream()
+                .map(expense -> {
+                    String categoryStr = expense.getCategory();
+                    CreditCardTransactionCategory category = CreditCardTransactionCategory.valueOf(categoryStr);
+                    BigDecimal monthlyAmount = expense.getMonthlyAmount();
+                    BigDecimal accumulatedAmount = accumulatedMap.getOrDefault(categoryStr, BigDecimal.ZERO);
+
+                    Double percentage = totalMonthlyAmount.compareTo(BigDecimal.ZERO) > 0
+                            ? monthlyAmount.divide(totalMonthlyAmount, 4, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100))
+                            .doubleValue()
+                            : 0.0;
+
+                    return new CategoryExpenseDetailDTO(
+                            category,
+                            category.toString(),
+                            monthlyAmount,
+                            accumulatedAmount,
+                            percentage,
+                            expense.getTransactionCount().intValue()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new ExpensesByCategoryResponse(
+                0,
+                "BRL",
+                totalMonthlyAmount,
+                categories
+        );
+    }
+
     private YearMonth parseReferenceMonth(Integer referenceMonth) {
         int year = referenceMonth / 100;
         int month = referenceMonth % 100;

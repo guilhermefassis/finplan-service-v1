@@ -32,10 +32,14 @@ public class BalanceController {
     @GetMapping("/analytics/expenses/by-category")
     public ExpensesByCategoryResponse getExpensesByCategory(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestParam Integer referenceMonth
+            @RequestParam(required = false)  Integer referenceMonth
     ) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        return cardBalanceService.getExpensesByCategory(userId, referenceMonth);
+        if(referenceMonth != null) {
+            return cardBalanceService.getExpensesByCategory(userId, referenceMonth);
+        }
+        return cardBalanceService.getTotalExpensesByCategory(userId);
+
     }
 
 

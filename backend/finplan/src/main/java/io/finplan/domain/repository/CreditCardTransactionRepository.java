@@ -40,6 +40,34 @@ public interface CreditCardTransactionRepository extends JpaRepository<CreditCar
     @Query("""
         SELECT\s
             t.category as category,
+            SUM(t.amount) as monthlyAmount,
+            COUNT(t.id) as transactionCount
+        FROM CreditCardTransactions t
+        JOIN t.creditCardInvoice i
+        WHERE t.creditCard.user.id = :userId
+        GROUP BY t.category
+        ORDER BY monthlyAmount DESC
+   \s""")
+    List<CategoryExpenseProjection> findTotalExpensesByCategory(
+            @Param("userId") UUID userId
+    );
+
+    @Query("""
+        SELECT\s
+            t.category as category,
+            SUM(t.amount) as totalAmount
+        FROM CreditCardTransactions t
+        WHERE t.creditCard.user.id = :userId
+        GROUP BY t.category
+   \s""")
+    List<CategoryTotalProjection> findTotalAccumulatedExpensesByCategory(
+            @Param("userId") UUID userId
+    );
+
+
+    @Query("""
+        SELECT\s
+            t.category as category,
             SUM(t.amount) as totalAmount
         FROM CreditCardTransactions t
         WHERE t.creditCard.user.id = :userId
