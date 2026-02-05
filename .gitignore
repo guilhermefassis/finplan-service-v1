@@ -38,7 +38,6 @@ backend/**/log/
 # Application properties com dados sensíveis
 backend/**/application-local.yml
 backend/**/application-dev.yml
-backend/**/application-test.yml
 backend/**/application-local.properties
 backend/**/application-secrets.yml
 backend/**/.env
