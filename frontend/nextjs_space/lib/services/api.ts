@@ -23,7 +23,7 @@ import {
 import { getSession } from 'next-auth/react';
 
 // Configuration
-const DATA_MODE = process.env.DATA_MODE || 'mock';
+const NEXT_PUBLIC_DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'mock';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/finplan/api/v1';
 
 
@@ -98,7 +98,7 @@ export const creditCardApi = {
   async getById(id: string): Promise<CreditCard> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/credit-cards/${id}`);
     }
     
@@ -111,7 +111,7 @@ export const creditCardApi = {
   async create(data: CreateCreditCardDTO): Promise<CreditCard> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall('/credit-cards', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -134,7 +134,7 @@ export const creditCardApi = {
   async update(id: string, data: UpdateCreditCardDTO): Promise<CreditCard> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/credit-cards/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
@@ -157,7 +157,7 @@ export const creditCardApi = {
   async disable(id: string): Promise<void> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       await apiCall(`/credit-cards/${id}/disable`, { method: 'DELETE' });
       return;
     }
@@ -173,7 +173,7 @@ export const creditCardApi = {
   async activate(id: string): Promise<void> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       await apiCall(`/credit-cards/${id}/activate`, { method: 'POST' });
       return;
     }
@@ -193,7 +193,7 @@ export const transactionApi = {
   async getAll(cardId: string): Promise<Transaction[]> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/credit-cards/${cardId}/transactions`);
     }
     
@@ -204,7 +204,7 @@ export const transactionApi = {
   async create(cardId: string, data: CreateTransactionDTO): Promise<Transaction> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/credit-cards/${cardId}/transactions`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -232,7 +232,7 @@ export const transactionApi = {
   async delete(cardId: string, groupId: string): Promise<void> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       await apiCall(`/credit-cards/${cardId}/transactions/${groupId}`, { method: 'DELETE' });
       return;
     }
@@ -260,7 +260,7 @@ export const invoiceApi = {
   async getByCard(cardId: string, referenceDate?: number, includeTransactions: boolean = false): Promise<Invoice[]> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       const params = new URLSearchParams();
       if (referenceDate) params.append('referenceDate', String(referenceDate));
       params.append('includeTransactions', String(includeTransactions));
@@ -278,7 +278,7 @@ export const invoiceApi = {
   async getById(cardId: string, invoiceId: string, includeTransactions: boolean = true): Promise<Invoice> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       const params = new URLSearchParams();
       params.append('includeTransactions', String(includeTransactions));
       return apiCall(`/credit-cards/${cardId}/invoices/${invoiceId}?${params.toString()}`);
@@ -293,7 +293,7 @@ export const invoiceApi = {
   async pay(cardId: string, invoiceId: string, data: PayInvoiceDTO): Promise<Invoice> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/credit-cards/${cardId}/invoices/${invoiceId}/pay`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -321,7 +321,7 @@ export const balanceApi = {
   async getMonthlyBalance(referenceDate: number): Promise<Balance> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       return apiCall(`/balances/cards?referenceDate=${referenceDate}`);
     }
     
@@ -338,7 +338,7 @@ export const analyticsApi = {
   async getExpensesByCategory(referenceMonth?: number): Promise<ExpensesByCategory> {
     await delay();
     
-    if (DATA_MODE === 'api') {
+    if (NEXT_PUBLIC_DATA_MODE === 'api') {
       const params = referenceMonth ? `?referenceMonth=${referenceMonth}` : '';
       return apiCall(`/balances/analytics/expenses/by-category${params}`);
     }
